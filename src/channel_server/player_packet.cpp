@@ -86,17 +86,24 @@ PACKET_IMPL(connect_data, ref_ptr<vana::channel_server::player> player) {
 	// Must do significant testing on all of the following to verify
 	builder
 		.add<int16_t>(0) // I think this is the minigame record
+		// foreach { int game, int win, int draw, int lose, int score }
 		.add<int16_t>(0) // I think this is the couple ring record
+		// foreach { int character_id, char[13] pair_name, long ring_cash_id, long other_ring_cash_id }
 		.add<int16_t>(0) // I think this is the friendship ring record
+		// foreach { int friend_id, char[13] friend_name, long ring_cash_id, long other_ring_cash_id, int friend_item_id }
 		.add<int16_t>(0); // I think this is the marriage ring record
+	// foreach { int marriage_id, int groom_id, int bride_id, ushort status, int groom_item_id, int bride_item_id, char[13] groom_name, char[13] bride_name}
 
 	player->get_inventory()->rock_packet(builder); // Teleport Rock/VIP Rock maps
 	player->get_monster_book()->connect_packet(builder);
 
 	builder
-		.unk<int16_t>() 
-		.add<int16_t>(0) // Amount of party quests (or extended quests? Maybe related to Battleship?), for every quest: game_quest_id quest_id, string quest_data
-		.unk<int16_t>()
+		.add<int16_t>(0) // Newyear cards
+		// foreach { int, int, string, byte, long, int, string, byte, byte, long, string }
+		.add<int16_t>(0) // Amount of party quests (or extended quests? Maybe related to Battleship?)
+		// foreach { game_quest_id quest_id, string quest_data }
+		.add<int16_t>(0) // Not sure what this is, but it doesnt seem to be used in the client.
+		// foreach { short, int }
 		.add<file_time>(file_time{});
 	return builder;
 }
