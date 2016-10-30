@@ -262,9 +262,11 @@ auto command_handler::handle_admin_command(ref_ptr<player> player, packet_reader
 			}
 			break;
 		}
-		case admin_opcodes::show_message_map:
-			player->send(packets::player::show_message(player->get_map()->get_player_names(), packets::player::notice_types::notice));
+		case admin_opcodes::show_message_map: {
+			int8_t notice_type = reader.get<int8_t>();
+			player->send(packets::player::show_message(player->get_map()->get_player_names(), notice_type));
 			break;
+		}
 		case admin_opcodes::snow:
 			player->get_map()->create_weather(player, true, reader.get<int32_t>(), constant::item::snowy_snow, "");
 			break;
