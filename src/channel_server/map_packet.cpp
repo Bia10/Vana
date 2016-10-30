@@ -61,13 +61,13 @@ PACKET_IMPL(player_packet, ref_ptr<vana::channel_server::player> player) {
 	builder
 		.add<game_job_id>(player->get_stats()->get_job())
 		.add_buffer(helpers::add_player_display(player))
-		.unk<int32_t>()
+		.add<int32_t>(player->get_inventory()->get_item_amount(constant::item::choco))
 		.add<game_item_id>(player->get_item_effect())
 		.add<game_item_id>(player->get_chair())
 		.add<point>(player->get_pos())
 		.add<int8_t>(player->get_stance())
 		.add<game_foothold_id>(player->get_foothold())
-		.unk<int8_t>();
+		.add<int8_t>(0); // Not used/discarded
 
 	for (int8_t i = 0; i < constant::inventory::max_pet_count; i++) {
 		if (pet *pet = player->get_pets()->get_summoned(i)) {
@@ -88,7 +88,7 @@ PACKET_IMPL(player_packet, ref_ptr<vana::channel_server::player> player) {
 
 	player->get_mounts()->mount_info_map_spawn_packet(builder);
 
-	builder.add<int8_t>(0); // Player room
+	builder.add<bool>(false); // Player room
 
 	bool has_chalkboard = !player->get_chalkboard().empty();
 	builder.add<bool>(has_chalkboard);
@@ -97,12 +97,20 @@ PACKET_IMPL(player_packet, ref_ptr<vana::channel_server::player> player) {
 	}
 
 	builder
-		.add<int8_t>(0) // Rings (crush)
-		.add<int8_t>(0) // Rings (friends)
-		.add<int8_t>(0) // Ring (marriage)
-		.unk<int8_t>()
-		.unk<int8_t>()
-		.unk<int8_t>();
+		.add<bool>(false) // Rings (crush)
+		// long, long, int
+		.add<bool>(false) // Rings (friends)
+		// long, long, int
+		.add<bool>(false) // Ring (marriage)
+		// int, int, int
+		.add<bool>(false); // Newyear cards
+		// int amount, foreach { int }
+
+	builder.add<bool>(true); // Hidden?
+
+	// For MonsterCarnival and Coconut maps, send 'team'. No checks available, so set to 0 by default
+	builder.add<int8_t>(0);
+
 	return builder;
 }
 
