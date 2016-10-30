@@ -27,7 +27,7 @@ namespace vana {
 
 		namespace packets {
 			PACKET(spawn_reactor, reactor *reactor);
-			PACKET(trigger_reactor, reactor *reactor);
+			PACKET(trigger_reactor, reactor *reactor, uint16_t action_delay, uint8_t event_index);
 			PACKET(destroy_reactor, reactor *reactor);
 		}
 	}

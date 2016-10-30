@@ -219,6 +219,8 @@ namespace vana {
 				auto set_music(lua_State *lua_vm) -> lua_return;
 				auto show_map_effect(lua_State *lua_vm) -> lua_return;
 				auto show_map_event(lua_State *lua_vm) -> lua_return;
+				auto set_obstacle_state(lua_State *lua_vm) -> lua_return;
+				auto reset_obstacle_states(lua_State *lua_vm) -> lua_return;
 
 				// Map
 				auto clear_drops(lua_State *lua_vm) -> lua_return;

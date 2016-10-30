@@ -38,14 +38,16 @@ PACKET_IMPL(spawn_reactor, reactor *reactor) {
 	return builder;
 }
 
-PACKET_IMPL(trigger_reactor, reactor *reactor) {
+PACKET_IMPL(trigger_reactor, reactor *reactor, uint16_t action_delay, uint8_t event_index) {
 	packet_builder builder;
 	builder
 		.add<packet_header>(SMSG_REACTOR_TRIGGER)
 		.add<game_map_object>(reactor->get_id())
 		.add<int8_t>(reactor->get_state())
 		.add<point>(reactor->get_pos())
-		.unk<int32_t>();
+		.add<uint16_t>(action_delay)
+		.add<uint8_t>(event_index)
+		.add<int8_t>(0); // state end delay, not sure how this works.
 	return builder;
 }
 

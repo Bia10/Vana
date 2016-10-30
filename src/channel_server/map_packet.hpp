@@ -60,6 +60,8 @@ namespace vana {
 				PACKET(boat_dock_update, bool docked, int8_t ship_kind);
 				PACKET(change_weather, bool admin_weather, game_item_id item_id = 0, const string &message = "");
 				PACKET(upgrade_tomb_effect, game_player_id player_id, game_item_id item_id, int32_t x, int32_t y);
+				PACKET(obstacle_state_change, const string &object, int32_t state);
+				PACKET(obstacle_state_reset);
 			}
 		}
 	}

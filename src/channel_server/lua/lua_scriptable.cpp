@@ -242,6 +242,8 @@ auto lua_scriptable::initialize() -> void {
 	expose("setMusic", &lua_exports::set_music);
 	expose("showMapEffect", &lua_exports::show_map_effect);
 	expose("showMapEvent", &lua_exports::show_map_event);
+	expose("setObstacleState", &lua_exports::set_obstacle_state);
+	expose("resetObstacleStates", &lua_exports::reset_obstacle_states);
 
 	// Map
 	expose("clearDrops", &lua_exports::clear_drops);
@@ -1527,6 +1529,21 @@ auto lua_exports::show_map_event(lua_State *lua_vm) -> lua_return {
 	else {
 		get_player(lua_vm, env)->send_map(packets::send_event(val));
 	}
+	return 0;
+}
+
+auto lua_exports::set_obstacle_state(lua_State *lua_vm) -> lua_return {
+	auto &env = get_environment(lua_vm);
+	string object = env.get<string>(lua_vm, 1);
+	int32_t state = env.get<int32_t>(lua_vm, 2);
+	
+	get_player(lua_vm, env)->send_map(packets::map::obstacle_state_change(object, state));
+	return 0;
+}
+
+auto lua_exports::reset_obstacle_states(lua_State *lua_vm) -> lua_return {
+	auto &env = get_environment(lua_vm);
+	get_player(lua_vm, env)->send_map(packets::map::obstacle_state_reset());
 	return 0;
 }
 

@@ -35,7 +35,7 @@ reactor::reactor(game_map_id map_id, game_reactor_id reactor_id, const point &po
 auto reactor::set_state(int8_t state, bool send_packet) -> void {
 	m_state = state;
 	if (send_packet) {
-		get_map()->send(packets::trigger_reactor(this));
+		get_map()->send(packets::trigger_reactor(this, 0, 0));
 	}
 }
 

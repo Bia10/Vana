@@ -73,7 +73,7 @@ auto lua_exports::reset(lua_State *lua_vm) -> lua_return {
 	reactor *reactor = get_reactor(lua_vm, env);
 	reactor->revive();
 	reactor->set_state(0, true);
-	reactor->get_map()->send(packets::trigger_reactor(reactor));
+	reactor->get_map()->send(packets::trigger_reactor(reactor, 0, 0));
 	return 0;
 }
 

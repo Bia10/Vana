@@ -42,24 +42,43 @@ namespace channel_server {
 auto reactor_handler::hit_reactor(ref_ptr<player> player, packet_reader &reader) -> void {
 	game_map_object id = map::make_reactor_id(reader.get<game_map_object>());
 
+	uint32_t option = reader.get<uint32_t>();
+	bool move_direction = (option & 1) == 1; // either use x1 or x2
+
+	uint16_t action_delay = reader.get<uint16_t>();
+
 	map *map = player->get_map();
 	reactor *reactor = map->get_reactor(id);
 
 	if (reactor != nullptr && reactor->is_alive()) {
 		auto &data = channel_server::get_instance().get_reactor_data_provider().get_reactor_data(reactor->get_reactor_id(), true);
-		if (reactor->get_state() < data.max_states - 1) {
-			const auto &reactor_event = data.states.at(reactor->get_state())[0]; // There's only one way to hit something
-			if (reactor_event.next_state < data.max_states - 1) {
+		// When a reactors next state has no effects, its basically dead
+		if (data.states.find(reactor->get_state()) != data.states.end()) {
+			// TODO: Include name in reactors, to effectively handle them (for state changes and map effects)
+			//		For example, in Orbis PQ jail maps, there are levers that toggle map objects
+			//		Its not possible to handle this correctly without knowing the reactor name.
+			// TODO: Calculate event index to use in the following line of code, based on 'option'
+			uint8_t event_index = 0;
+			const auto &reactor_event = data.states.at(reactor->get_state())[event_index];
+			auto next_state = reactor_event.next_state;
+
+			bool destroy_reactor = data.states.find(next_state) == data.states.end();
+
+			auto &channel = channel_server::get_instance();
+			string filename;
+
+			if (!destroy_reactor) {
+				// Activate next state.
+
 				if (reactor_event.type == 100) {
 					return;
 				}
-				map->send(packets::trigger_reactor(reactor));
-				reactor->set_state(reactor_event.next_state, true);
-				return;
+				map->send(packets::trigger_reactor(reactor, action_delay, event_index));
+				reactor->set_state(next_state, true);
 			}
 			else {
-				auto &channel = channel_server::get_instance();
-				string filename = channel.get_script_data_provider().get_script(&channel, reactor->get_reactor_id(), data::type::script_type::reactor);
+				// Reactor is finished
+				filename = channel.get_script_data_provider().get_script(&channel, reactor->get_reactor_id(), data::type::script_type::reactor);
 
 				if (utilities::file::exists(filename)) {
 					lua::lua_reactor{filename, player->get_id(), id, reactor->get_map_id()};
@@ -69,7 +88,24 @@ auto reactor_handler::hit_reactor(ref_ptr<player> player, packet_reader &reader)
 					reactor->drop(player);
 				}
 
-				reactor->set_state(reactor_event.next_state, false);
+				reactor->set_state(next_state, false);
+			}
+			
+			filename = channel.get_script_data_provider().build_script_path(
+				data::type::script_type::reactor,
+				utilities::str::lexical_cast<string>(reactor->get_reactor_id())
+			);
+
+			if (utilities::file::exists(filename)) {
+				lua::lua_reactor{filename, player->get_id(), id, reactor->get_map_id()};
+			}
+#ifdef _DEBUG
+			else {
+				channel.log(log_type::debug_error, "Missing reactor change state script '" + filename + "'");
+			}
+#endif
+
+			if (destroy_reactor) {
 				reactor->kill();
 				map->remove_reactor(id);
 				map->send(packets::destroy_reactor(reactor));
@@ -87,7 +123,7 @@ auto reactor_handler::touch_reactor(ref_ptr<player> player, packet_reader &reade
 
 	if (reactor != nullptr && reactor->is_alive()) {
 		int8_t new_state = reactor->get_state() + (is_touching ? 1 : -1);
-		map->send(packets::trigger_reactor(reactor));
+		map->send(packets::trigger_reactor(reactor, 0, 0));
 		reactor->set_state(new_state, true);
 	}
 }

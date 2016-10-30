@@ -318,6 +318,23 @@ PACKET_IMPL(upgrade_tomb_effect, game_player_id player_id, game_item_id item_id,
 	return builder;
 }
 
+PACKET_IMPL(obstacle_state_change, const string &object, int32_t state) {
+	packet_builder builder;
+	builder
+		.add<packet_header>(SMSG_MAP_OBSTACLE_TOGGLE)
+		.add<string>(object)
+		.add<int32_t>(state);
+
+	return builder;
+}
+
+PACKET_IMPL(obstacle_state_reset) {
+	packet_builder builder;
+	builder.add<packet_header>(SMSG_MAP_OBSTACLE_RESET);
+
+	return builder;
+}
+
 }
 }
 }
