@@ -80,6 +80,7 @@ namespace vana {
 				star_megassenger = 5075004,
 				heart_megassenger = 5075005,
 				congratulatory_song = 5100000,
+				choco = 5110000,
 				snowy_snow = 5120000,
 				safety_charm = 5130000,
 				pet_name_tag = 5170000,
