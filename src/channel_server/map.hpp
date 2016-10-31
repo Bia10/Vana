@@ -48,6 +48,7 @@ namespace vana {
 	namespace channel_server {
 		class drop;
 		class instance;
+		class kite;
 		class mist;
 		class mob;
 		class player;
@@ -205,6 +206,9 @@ namespace vana {
 
 			// Weather cash item
 			auto create_weather(ref_ptr<player> player, bool admin_weather, int32_t time, game_item_id item_id, const string &message) -> bool;
+
+			// Kites
+			auto create_kite(ref_ptr<player> player, game_item_id item_id, const string &message) -> void;
 		private:
 			static const game_map_object npc_start = 100;
 			static const game_map_object reactor_start = 200;
@@ -235,6 +239,8 @@ namespace vana {
 			auto find_random_floor_pos() -> point;
 			auto find_random_floor_pos(const rect &area) -> point;
 			auto buff_players(game_item_id buff_id) -> void;
+			auto remove_kite(kite* kite, bool expired) -> void;
+			auto clear_kites(time_point time) -> void;
 
 			// Longer-lived data
 			bool m_ship = false;
@@ -256,6 +262,7 @@ namespace vana {
 			id_pool<game_map_object> m_object_ids;
 			id_pool<game_mist_id> m_mist_ids;
 			recursive_mutex m_drops_mutex;
+			recursive_mutex m_kites_mutex;
 			ref_ptr<const data::type::map_info> m_info;
 			vector<data::type::foothold_info> m_footholds;
 			vector<data::type::reactor_spawn_info> m_reactor_spawns;
@@ -278,6 +285,7 @@ namespace vana {
 			hash_map<game_map_object, drop *> m_drops;
 			hash_map<game_mist_id, mist *> m_poison_mists;
 			hash_map<game_mist_id, mist *> m_mists;
+			hash_map<game_map_object, kite *> m_kites;
 		};
 	}
 }

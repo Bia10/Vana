@@ -109,6 +109,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\channel_server\custom_functions.cpp" />
+    <ClCompile Include="src\channel_server\kite_packet.cpp" />
     <ClCompile Include="src\channel_server\login_server_session.cpp" />
     <ClCompile Include="src\channel_server\login_server_session_handler.cpp" />
     <ClCompile Include="src\channel_server\lua\lua_instance.cpp" />
@@ -223,6 +224,8 @@
     <ClInclude Include="src\channel_server\key_map_action.hpp" />
     <ClInclude Include="src\channel_server\key_map_key.hpp" />
     <ClInclude Include="src\channel_server\key_map_type.hpp" />
+    <ClInclude Include="src\channel_server\kite.hpp" />
+    <ClInclude Include="src\channel_server\kite_packet.hpp" />
     <ClInclude Include="src\channel_server\login_server_session.hpp" />
     <ClInclude Include="src\channel_server\login_server_session_handler.hpp" />
     <ClInclude Include="src\channel_server\lua\lua_instance.hpp" />

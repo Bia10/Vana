@@ -726,6 +726,21 @@ auto inventory_handler::use_cash_item(ref_ptr<player> player, packet_reader &rea
 				player->send_map(packets::inventory::play_cash_song(item_id, player->get_name()));
 				used = true;
 				break;
+
+				
+			case constant::item::korean_kite:
+			case constant::item::heart_balloon:
+			case constant::item::graduation_banner:
+			case constant::item::admission_banner: {
+				string message = reader.get<string>();
+				player->get_map()->create_kite(player, item_id, message);
+				used = true;
+				break;
+			}
+#ifdef _DEBUG
+			default:
+				channel_server::get_instance().log(log_type::debug_error, "Unhandled cash item " + std::to_string(item_id));
+#endif
 		}
 	}
 	if (used) {

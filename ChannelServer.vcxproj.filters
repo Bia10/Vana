@@ -351,6 +351,9 @@
     <ClCompile Include="src\channel_server\move_path.cpp">
       <Filter>ChannelServer</Filter>
     </ClCompile>
+    <ClCompile Include="src\channel_server\kite_packet.cpp">
+      <Filter>Packets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\channel_server\buffs.hpp">
@@ -671,6 +674,12 @@
       <Filter>Data Loading</Filter>
     </ClInclude>
     <ClInclude Include="src\channel_server\move_path.hpp">
+      <Filter>ChannelServer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\channel_server\kite_packet.hpp">
+      <Filter>Packets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\channel_server\kite.hpp">
       <Filter>ChannelServer</Filter>
     </ClInclude>
   </ItemGroup>

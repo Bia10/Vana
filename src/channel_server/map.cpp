@@ -32,6 +32,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "channel_server/gm_packet.hpp"
 #include "channel_server/instance.hpp"
 #include "channel_server/inventory.hpp"
+#include "channel_server/kite.hpp"
+#include "channel_server/kite_packet.hpp"
 #include "channel_server/maple_tv_packet.hpp"
 #include "channel_server/maple_tvs.hpp"
 #include "channel_server/map_packet.hpp"
@@ -1237,6 +1239,7 @@ auto map::map_tick(const time_point &now) -> void {
 	check_spawn(now);
 	clear_drops(now);
 	check_mists();
+	clear_kites(now);
 
 	if (utilities::time::get_second() % 3 == 0) {
 		check_shadow_web();
@@ -1417,6 +1420,49 @@ auto map::create_weather(ref_ptr<player> player, bool admin_weather, int32_t tim
 		get_timers(),
 		seconds{time});
 	return true;
+}
+
+auto map::create_kite(ref_ptr<player> player, game_item_id item_id, const string &message) -> void {
+	auto new_kite = new kite(
+		this->get_id(),
+		item_id,
+		player->get_pos(),
+		player->get_id(),
+		player->get_name(),
+		message
+	);
+	// TODO: Check placement position
+
+	owned_lock<recursive_mutex> l{m_kites_mutex};
+	game_map_object id = m_object_ids.lease();
+
+	new_kite->set_id(id);
+	new_kite->set_spawned_at_time(utilities::time::get_now());
+
+	m_kites[id] = new_kite;
+	send(packets::spawn_kite(new_kite));
+}
+
+auto map::remove_kite(kite* kite, bool expired) -> void {
+	send(packets::despawn_kite(kite, expired ? packets::kite_despawn_reason::expired : packets::kite_despawn_reason::removed));
+	m_kites.erase(kite->get_id());
+	delete kite;
+}
+
+auto map::clear_kites(time_point time) -> void {
+	// Clear drops based on how long they have been in the map
+	owned_lock<recursive_mutex> l{m_kites_mutex};
+
+	time -= minutes{60}; // Kites disappear after 1 hour
+
+	hash_map<game_map_object, kite *> kites = m_kites;
+	for (const auto &kvp : kites) {
+		if (kite *kite = kvp.second) {
+			if (kite->get_spawned_at_time() < time) {
+				remove_kite(kite, true);
+			}
+		}
+	}
 }
 
 // Instance
