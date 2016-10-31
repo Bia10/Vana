@@ -381,15 +381,18 @@ auto player_handler::handle_special_skills(ref_ptr<player> player, packet_reader
 			break;
 		}
 		case constant::skill::chief_bandit::chakra: {
-			game_stat dex = player->get_stats()->get_dex(true);
-			game_stat luk = player->get_stats()->get_luk(true);
+			auto stats = player->get_stats();
+			game_stat dex = stats->get_dex(true);
+			game_stat luk = stats->get_luk(true);
+
 			int16_t recovery = player->get_skills()->get_skill_info(skill_id)->y;
-			int16_t maximum = (luk * 66 / 10 + dex) * 2 / 10 * (recovery / 100 + 1);
-			int16_t minimum = (luk * 33 / 10 + dex) * 2 / 10 * (recovery / 100 + 1);
+			int32_t maximum = (luk * 66 / 10 + dex) * 2 / 10 * (recovery / 100 + 1);
+			int32_t minimum = (luk * 33 / 10 + dex) * 2 / 10 * (recovery / 100 + 1);
 			// Maximum = (luk * 6.6 + dex) * 0.2 * (recovery% / 100 + 1)
 			// Minimum = (luk * 3.3 + dex) * 0.2 * (recovery% / 100 + 1)
 			// I used 66 / 10 and 2 / 10 respectively to get 6.6 and 0.2 without using floating points
-			player->get_stats()->modify_hp(randomizer::rand<int16_t>(maximum, minimum));
+			
+			stats->modify_hp(randomizer::rand<int32_t>(maximum, minimum));
 			break;
 		}
 	}
