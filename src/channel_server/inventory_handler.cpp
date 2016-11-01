@@ -962,5 +962,77 @@ auto inventory_handler::handle_script_item(ref_ptr<player> player, packet_reader
 	}
 }
 
+auto inventory_handler::handle_remote_gachapon(ref_ptr<player> player, packet_reader &reader) -> void {
+	game_item_id item_id = reader.get<game_item_id>();
+	int32_t gachapon_index = reader.get<int32_t>();
+
+	if (player->get_inventory()->get_item_amount(item_id) == 0) {
+		// Hacking
+		return;
+	}
+
+	string gachapon_script;
+	game_npc_id npc_id;
+	switch (gachapon_index) {
+	case 0: // henesys
+		gachapon_script = "gachapon1";
+		npc_id = 9100100;
+		break;
+	case 1: // ellinia
+		gachapon_script = "gachapon2";
+		npc_id = 9100101;
+		break;
+	case 2: // perion
+		gachapon_script = "gachapon3";
+		npc_id = 9100102;
+		break;
+	case 3: // kerning
+		gachapon_script = "gachapon4";
+		npc_id = 9100103;
+		break;
+	case 4: // sleepywood
+		gachapon_script = "gachapon5";
+		npc_id = 9100104;
+		break;
+	case 5: // mushroom shrine
+		gachapon_script = "gachapon6";
+		npc_id = 9100105;
+		break;
+	case 6: // Showa spa (M)
+		gachapon_script = "gachapon7";
+		npc_id = 9100106;
+		break;
+	case 7: // Showa spa (F)
+		gachapon_script = "gachapon8";
+		npc_id = 9100107;
+		break;
+	case 8: // NLC
+		gachapon_script = "gachapon10";
+		npc_id = 9100109;
+		break;
+	case 9: // Nautilus
+		gachapon_script = "gachapon18";
+		npc_id = 9100117;
+		break;
+	default:
+		// Hacking
+		return;
+	}
+	
+	auto &channel = channel_server::get_instance();
+	string script_name = channel.get_script_data_provider().build_script_path(data::type::script_type::npc, gachapon_script);
+	if (script_name.empty()) {
+		// Hacking or no script for item found
+		return;
+	}
+
+	// Let's run the NPC
+	npc *script_npc = new npc{npc_id, player, script_name};
+	if (!script_npc->check_end()) {
+		// NPC is running/script found
+		script_npc->run();
+	}
+}
+
 }
 }
