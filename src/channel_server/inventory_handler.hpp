@@ -47,6 +47,7 @@ namespace vana {
 			auto handle_reward_item(ref_ptr<player> player, packet_reader &reader) -> void;
 			auto handle_script_item(ref_ptr<player> player, packet_reader &reader) -> void;
 			auto handle_remote_gachapon(ref_ptr<player> player, packet_reader &reader) -> void;
+			auto handle_bridle_item(ref_ptr<player> player, packet_reader &reader) -> void;
 		}
 	}
 }

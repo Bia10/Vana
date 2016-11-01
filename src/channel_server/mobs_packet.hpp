@@ -47,6 +47,7 @@ namespace vana {
 				PACKET(show_boss_hp, ref_ptr<mob> value);
 				PACKET(die_mob, game_map_object map_mob_id, int8_t death = 1);
 				PACKET(show_spawn_effect, int8_t summon_effect, const point &pos);
+				PACKET(show_bridle_effect, game_map_object map_mob_id, game_item_id item_id, bool success);
 			}
 		}
 	}

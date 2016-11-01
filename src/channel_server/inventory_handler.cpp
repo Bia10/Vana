@@ -1037,5 +1037,32 @@ auto inventory_handler::handle_remote_gachapon(ref_ptr<player> player, packet_re
 	}
 }
 
+auto inventory_handler::handle_bridle_item(ref_ptr<player> player, packet_reader &reader) -> void {
+	reader.skip<game_tick_count>();
+	game_inventory_slot slot = reader.get<game_inventory_slot>();
+	game_item_id item_id = reader.get<game_item_id>();
+	game_map_object map_mob_id = reader.get<game_map_object>();
+
+	
+	item *item = player->get_inventory()->get_item(constant::inventory::use, slot);
+	if (item == nullptr || item->get_id() != item_id ||
+		game_logic_utilities::get_item_type(item_id) != constant::item::type::item_bridle) {
+		// Hacking or hacking failure
+		player->send(packets::inventory::blank_update());
+		return;
+	}
+
+	if (ref_ptr<mob> mob = player->get_map()->get_mob(map_mob_id)) {
+		player->send_map(packets::mobs::show_bridle_effect(map_mob_id, item_id, true));
+		mob->kill();
+		inventory::take_item(player, item_id, 1);
+	}
+	else {
+		// Hacking or hacking failure
+		player->send(packets::inventory::blank_update());
+		return;
+	}
+}
+
 }
 }

@@ -167,6 +167,7 @@ auto player::handle(packet_reader &reader) -> result {
 				case CMSG_TELEPORT_ROCK: inventory_handler::handle_rock_functions(shared_from_this(), reader); break;
 				case CMSG_TELEPORT_ROCK_USE: inventory_handler::handle_rock_teleport(shared_from_this(), constant::item::special_teleport_rock, reader); break;
 				case CMSG_TOWN_SCROLL_USE: inventory_handler::use_return_scroll(shared_from_this(), reader); break;
+				case CMSG_USE_BRIDLE_ITEM: inventory_handler::handle_bridle_item(shared_from_this(), reader); break;
 				case CMSG_USE_CHAIR: inventory_handler::use_chair(shared_from_this(), reader); break;
 				case CMSG_USE_REMOTE_GACHAPON_TICKET: inventory_handler::handle_remote_gachapon(shared_from_this(), reader); break;
 				case CMSG_USE_REWARD_ITEM: inventory_handler::handle_reward_item(shared_from_this(), reader); break;

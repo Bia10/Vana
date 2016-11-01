@@ -262,6 +262,16 @@ PACKET_IMPL(show_spawn_effect, int8_t summon_effect, const point &pos) {
 	return builder;
 }
 
+PACKET_IMPL(show_bridle_effect, game_map_object map_mob_id, game_item_id item_id, bool success) {
+	packet_builder builder;
+	builder
+		.add<packet_header>(SMSG_MOB_EFFECT_BY_ITEM)
+		.add<game_map_object>(map_mob_id)
+		.add<game_item_id>(item_id)
+		.add<bool>(success);
+	return builder;
+}
+
 }
 }
 }
