@@ -1424,10 +1424,8 @@ auto map::create_weather(ref_ptr<player> player, bool admin_weather, int32_t tim
 
 auto map::create_kite(ref_ptr<player> player, game_item_id item_id, const string &message) -> void {
 	auto new_kite = new kite(
-		this->get_id(),
 		item_id,
 		player->get_pos(),
-		player->get_id(),
 		player->get_name(),
 		message
 	);
