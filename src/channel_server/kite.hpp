@@ -26,10 +26,8 @@ namespace vana {
 			NO_DEFAULT_CONSTRUCTOR(kite);
 			NONCOPYABLE(kite);
 		public:
-			kite(game_map_id map_id, game_item_id item_id, const point &owner_pos, game_player_id owner, const string& owner_name, const string& message) :
-			m_owner{ owner },
+			kite(game_item_id item_id, const point &owner_pos, const string& owner_name, const string& message) :
 			m_owner_name{ owner_name },
-			m_map_id{ map_id },
 			m_item_id{ item_id },
 			m_owner_position{ owner_pos },
 			m_message{ message } {
@@ -38,9 +36,7 @@ namespace vana {
 			auto set_id(game_map_object id) -> void { m_id = id; }
 			auto set_spawned_at_time(time_point time) -> void { m_spawned_at_time = time; }
 
-			auto get_owner() const -> game_player_id { return m_owner; }
 			auto get_owner_name() const -> const string& { return m_owner_name; }
-			auto get_map_id() const -> game_map_id { return m_map_id; }
 			auto get_id() const -> game_map_object { return m_id; }
 			auto get_owner_position() const -> const point& { return m_owner_position; }
 			auto get_item_id() const -> game_item_id { return m_item_id; }
@@ -48,8 +44,6 @@ namespace vana {
 			auto get_spawned_at_time() const -> time_point { return m_spawned_at_time; }
 
 		private:
-			game_player_id m_owner = 0;
-			game_map_id m_map_id = 0;
 			game_map_object m_id = 0;
 			game_item_id m_item_id;
 			point m_owner_position;
