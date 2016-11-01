@@ -99,6 +99,7 @@ namespace vana {
 				diablo_messenger = 5390000,
 				cloud9_messenger = 5390001,
 				loveholic_messenger = 5390002,
+				miu_traveling_merchant = 5450000,
 				wheel_of_destiny = 5510000,
 				scissors_of_karma = 5520000,
 				vicious_hammer = 5570000

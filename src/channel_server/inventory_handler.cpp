@@ -737,6 +737,9 @@ auto inventory_handler::use_cash_item(ref_ptr<player> player, packet_reader &rea
 				used = true;
 				break;
 			}
+			case constant::item::miu_traveling_merchant:
+				npc_handler::show_shop(player, constant::item::miu_traveling_merchant);
+				break;
 #ifdef _DEBUG
 			default:
 				channel_server::get_instance().log(log_type::debug_error, "Unhandled cash item " + std::to_string(item_id));
