@@ -718,6 +718,7 @@ auto map::spawn_shell(game_mob_id mob_id, const point &pos, game_foothold_id foo
 	ref_ptr<mob> no_owner = nullptr;
 	auto value = make_ref_ptr<mob>(id, get_id(), mob_id, no_owner, pos, -1, false, foothold, mob_control_status::none);
 	m_mobs[id] = value;
+	send(packets::mobs::spawn_mob(value, -4, nullptr, mob_spawn_type::spawn));
 	update_mob_control(value, mob_spawn_type::spawn);
 
 	if (instance *inst = get_instance()) {
@@ -986,9 +987,7 @@ auto map::spawn_zakum(const point &pos, game_foothold_id foothold) -> void {
 }
 
 auto map::convert_shell_to_normal(ref_ptr<mob> mob) -> void {
-	send(packets::mobs::end_control_mob(mob->get_map_mob_id()));
-	send(packets::mobs::spawn_mob(mob, 0, nullptr));
-	update_mob_control(mob);
+	send(packets::mobs::toggle_suspend(mob->get_map_mob_id(), false));
 }
 
 auto map::add_webbed_mob(game_map_object map_mob_id) -> void {

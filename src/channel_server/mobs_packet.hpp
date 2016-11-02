@@ -35,18 +35,20 @@ namespace vana {
 				PACKET(spawn_mob, ref_ptr<mob> value, int8_t summon_effect, ref_ptr<mob> owner = nullptr, mob_spawn_type spawn = mob_spawn_type::existing);
 				PACKET(request_control, ref_ptr<mob> value, mob_spawn_type spawn);
 				PACKET(mob_packet, ref_ptr<mob> value, int8_t summon_effect, ref_ptr<mob> owner, mob_spawn_type spawn);
+				PACKET(encode_mob_stats, ref_ptr<mob> value);
 				PACKET(end_control_mob, game_map_object map_mob_id);
 				PACKET(move_mob_response, game_map_object map_mob_id, int16_t move_id, bool skill_possible, int32_t mp, game_mob_skill_id skill, game_mob_skill_level level);
 				PACKET(move_mob, game_map_object map_mob_id, bool skill_possible, int8_t raw_action, game_mob_skill_id skill, game_mob_skill_level level, int16_t option, const move_path &path);
 				PACKET(heal_mob, game_map_object map_mob_id, int32_t amount);
 				PACKET(hurt_mob, game_map_object map_mob_id, game_damage amount);
 				PACKET(damage_friendly_mob, ref_ptr<mob> value, game_damage damage);
-				PACKET(apply_status, game_map_object map_mob_id, int32_t status_mask, const vector<status_info> &info, int16_t delay, const vector<int32_t> &reflection);
+				PACKET(apply_status, ref_ptr<mob> value, int16_t delay);
 				PACKET(remove_status, game_map_object map_mob_id, int32_t status);
 				PACKET(show_hp, game_map_object map_mob_id, int8_t percentage);
 				PACKET(show_boss_hp, ref_ptr<mob> value);
 				PACKET(die_mob, game_map_object map_mob_id, int8_t death = 1);
 				PACKET(show_spawn_effect, int8_t summon_effect, const point &pos);
+				PACKET(toggle_suspend, game_map_object map_mob_id, bool suspended);
 				PACKET(show_bridle_effect, game_map_object map_mob_id, game_item_id item_id, bool success);
 			}
 		}

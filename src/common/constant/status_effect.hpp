@@ -30,21 +30,22 @@ namespace vana {
 					wdef = 0x02,
 					matk = 0x04,
 					mdef = 0x08,
-					acc = 0x10,
 
+					acc = 0x10,
 					avoid = 0x20,
 					speed = 0x40,
 					stun = 0x80,
+
 					freeze = 0x100,
 					poison = 0x200,
-
 					seal = 0x400,
-					no_clue1 = 0x800,
+					no_clue1 = 0x800, // Darkness
+
 					weapon_attack_up = 0x1000,
 					weapon_defense_up = 0x2000,
 					magic_attack_up = 0x4000,
-
 					magic_defense_up = 0x8000,
+
 					doom = 0x10000,
 					shadow_web = 0x20000,
 					weapon_immunity = 0x40000,
@@ -54,14 +55,14 @@ namespace vana {
 					no_clue3 = 0x200000,
 					ninja_ambush = 0x400000,
 					no_clue4 = 0x800000,
-					venomous_weapon = 0x1000000,
 
-					no_clue5 = 0x2000000,
-					no_clue6 = 0x4000000,
+					venomous_weapon = 0x1000000,
+					no_clue5 = 0x2000000, // Blind?
+					no_clue6 = 0x4000000, // Seal skill?
 					empty = 0x8000000, // All mobs have this when they spawn
+
 					hypnotize = 0x10000000,
 					weapon_damage_reflect = 0x20000000,
-
 					magic_damage_reflect = 0x40000000,
 					no_clue7 = 0x80000000 // Last bit you can use with 4 bytes
 				};

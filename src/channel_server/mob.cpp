@@ -62,6 +62,7 @@ mob::mob(game_map_object map_mob_id, game_map_id map_id, game_mob_id mob_id, vie
 	m_status = constant::status_effect::mob::empty;
 	status_info empty{constant::status_effect::mob::empty, 0, 0, seconds{0}};
 	m_statuses[empty.status] = empty;
+	increase_damage_stat_index();
 
 	if (m_info->hp_recovery > 0 || m_info->mp_recovery > 0) {
 		int32_t hp_recovery = m_info->hp_recovery;
@@ -163,7 +164,6 @@ auto mob::apply_web_damage() -> void {
 
 auto mob::add_status(game_player_id player_id, vector<status_info> &status_info) -> void {
 	int32_t added_status = 0;
-	vector<int32_t> reflection;
 	map *map = get_map();
 
 	for (auto &info : status_info) {
@@ -197,10 +197,6 @@ auto mob::add_status(game_player_id player_id, vector<status_info> &status_info)
 					info.val += m_statuses[c_status].val; // Increase the damage
 				}
 				break;
-			case constant::status_effect::mob::weapon_damage_reflect:
-			case constant::status_effect::mob::magic_damage_reflect:
-				reflection.push_back(info.reflection);
-				break;
 		}
 
 		m_statuses[c_status] = info;
@@ -232,7 +228,10 @@ auto mob::add_status(game_player_id player_id, vector<status_info> &status_info)
 	for (const auto &kvp : m_statuses) {
 		m_status |= kvp.first;
 	}
-	map->send(packets::mobs::apply_status(m_map_mob_id, added_status, status_info, 300, reflection));
+
+	increase_damage_stat_index();
+
+	map->send(packets::mobs::apply_status(shared_from_this(), 300));
 }
 
 auto mob::remove_status(int32_t status, bool from_timer) -> void {

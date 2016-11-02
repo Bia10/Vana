@@ -69,6 +69,7 @@ namespace vana {
 			auto get_skill_feasibility() const -> bool { return m_skill_feasible; }
 			auto get_anticipated_skill() const -> game_mob_skill_id { return m_anticipated_skill; }
 			auto get_anticipated_skill_level() const -> game_mob_skill_level { return m_anticipated_skill_level; }
+			auto get_damage_stat_index() const -> int8_t { return m_damage_stat_index; }
 			auto get_hp_bar_color() const -> int8_t { return m_info->hp_color; }
 			auto get_hp_bar_bg_color() const -> int8_t { return m_info->hp_background_color; }
 			auto get_venom_count() const -> int8_t { return m_venom_count; }
@@ -118,10 +119,15 @@ namespace vana {
 			auto can_cast_skills() const -> bool;
 			auto get_spawn_id() const -> int32_t { return m_spawn_id; }
 			auto get_sponge() const -> view_ptr<mob> { return m_sponge; }
+			auto increase_damage_stat_index() -> void {
+				if (m_damage_stat_index >= 127) m_damage_stat_index = 0;
+				m_damage_stat_index++;
+			}
 
 			bool m_skill_feasible = false;
 			int8_t m_venom_count = 0;
 			int8_t m_mp_eater_count = 0;
+			int8_t m_damage_stat_index = 0;
 			game_skill_level m_web_level = 0;
 			game_mob_skill_id m_anticipated_skill = 0;
 			game_mob_skill_level m_anticipated_skill_level = 0;
