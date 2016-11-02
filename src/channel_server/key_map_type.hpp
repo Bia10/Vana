@@ -28,7 +28,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 	make(type, menu, 4) \
 	make(type, basic_action, 5) \
 	make(type, basic_face, 6) \
-	make(type, effect, 7)
+	make(type, effect, 7) \
+	make(type, skill_macro, 8)
 
 namespace vana {
 	ENUM_CLASS(key_map_type, int8_t, ENUM)
