@@ -336,6 +336,14 @@ PACKET_IMPL(stalk_remove_player, vector<game_player_id> player_ids) {
 	return builder;
 }
 
+PACKET_IMPL(damage_by_map, int32_t damage) {
+	packet_builder builder;
+	builder
+		.add<packet_header>(SMSG_NOTIFY_HP_DAMAGE_BY_FIELD)
+		.add<int32_t>(damage);
+
+	return builder;
+}
 }
 }
 }

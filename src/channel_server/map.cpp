@@ -1249,6 +1249,7 @@ auto map::map_tick(const time_point &now) -> void {
 			if (auto player = kvp.second) {
 				if (!player->get_stats()->is_dead() && !player->has_gm_benefits()) {
 					player->get_stats()->damage_hp(dps);
+					player->send(packets::player::damage_by_map(dps));
 				}
 			}
 		}

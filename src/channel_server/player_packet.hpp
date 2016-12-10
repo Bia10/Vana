@@ -64,6 +64,7 @@ namespace vana {
 				PACKET(stalk_result, ref_ptr<vana::channel_server::player> player);
 				PACKET(stalk_add_or_update_player, ref_ptr<vana::channel_server::player> player);
 				PACKET(stalk_remove_player, vector<game_player_id> player_ids);
+				PACKET(damage_by_map, int32_t damage);
 			}
 		}
 	}
