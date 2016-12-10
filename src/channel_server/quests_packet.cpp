@@ -117,12 +117,7 @@ PACKET_IMPL(quest_error, game_quest_id quest_id, int8_t error_code) {
 }
 
 PACKET_IMPL(quest_expire, game_quest_id quest_id) {
-	packet_builder builder;
-	builder
-		.add<packet_header>(SMSG_QUEST_UPDATE)
-		.add<int8_t>(0x0F)
-		.add<game_quest_id>(quest_id);
-	return builder;
+	return quest_error(quest_id, 0x0F);
 }
 
 PACKET_IMPL(forfeit_quest, game_quest_id quest_id) {

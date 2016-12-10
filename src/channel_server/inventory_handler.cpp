@@ -406,7 +406,6 @@ auto inventory_handler::use_cash_item(ref_ptr<player> player, packet_reader &rea
 	bool used = false;
 	if (game_logic_utilities::get_item_type(item_id) == constant::item::type::weather_cash) {
 		string message = reader.get<string>();
-		reader.skip<game_tick_count>();
 		if (message.length() <= 35) {
 			map *map = player->get_map();
 			message = player->get_name() + " 's message : " + message;
@@ -617,7 +616,6 @@ auto inventory_handler::use_cash_item(ref_ptr<player> player, packet_reader &rea
 					string msg3 = reader.get<string>();
 					string msg4 = reader.get<string>();
 					string msg5 = reader.get<string>();
-					reader.skip<game_tick_count>();
 
 					channel_server::get_instance().get_maple_tvs().add_message(player, receiver, msg1, msg2, msg3, msg4, msg5, item_id - (item_id == constant::item::megassenger ? 3 : 0), time);
 
@@ -641,7 +639,6 @@ auto inventory_handler::use_cash_item(ref_ptr<player> player, packet_reader &rea
 				string msg3 = reader.get<string>();
 				string msg4 = reader.get<string>();
 				string msg5 = reader.get<string>();
-				reader.skip<game_tick_count>();
 
 				channel_server::get_instance().get_maple_tvs().add_message(player, nullptr, msg1, msg2, msg3, msg4, msg5, item_id - (item_id == constant::item::star_megassenger ? 3 : 0), time);
 
@@ -668,7 +665,6 @@ auto inventory_handler::use_cash_item(ref_ptr<player> player, packet_reader &rea
 					string msg3 = reader.get<string>();
 					string msg4 = reader.get<string>();
 					string msg5 = reader.get<string>();
-					reader.skip<game_tick_count>();
 
 					channel_server::get_instance().get_maple_tvs().add_message(player, receiver, msg1, msg2, msg3, msg4, msg5, item_id - (item_id == constant::item::heart_megassenger ? 3 : 0), time);
 
@@ -728,8 +724,6 @@ auto inventory_handler::use_cash_item(ref_ptr<player> player, packet_reader &rea
 				player->send_map(packets::inventory::play_cash_song(item_id, player->get_name()));
 				used = true;
 				break;
-
-				
 			case constant::item::korean_kite:
 			case constant::item::heart_balloon:
 			case constant::item::graduation_banner:
@@ -748,6 +742,11 @@ auto inventory_handler::use_cash_item(ref_ptr<player> player, packet_reader &rea
 #endif
 		}
 	}
+
+	if (reader.get_buffer_length() == 4) {
+		reader.skip<game_tick_count>();
+	}
+
 	if (used) {
 		inventory::take_item(player, item_id, 1);
 	}

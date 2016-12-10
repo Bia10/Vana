@@ -183,6 +183,7 @@ auto maps::use_portal(ref_ptr<player> player, packet_reader &reader) -> void {
 auto maps::use_scripted_portal(ref_ptr<player> player, packet_reader &reader) -> void {
 	reader.skip<game_portal_count>();
 	string portal_name = reader.get<string>();
+	reader.skip<point>(); // Player position (for distance checking)
 
 	const data::type::portal_info * const portal = player->get_map()->get_portal(portal_name);
 	if (portal == nullptr) {

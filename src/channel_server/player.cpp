@@ -264,6 +264,9 @@ auto player::on_disconnect() -> void {
 
 auto player::player_connect(packet_reader &reader) -> void {
 	game_player_id id = reader.get<game_player_id>();
+	reader.get<int8_t>(); // GM level 4?
+	reader.skip<int8_t>(); // Constant '0'
+
 	bool has_transfer_packet = false;
 	auto &channel = channel_server::get_instance();
 	auto &provider = channel.get_player_data_provider();
