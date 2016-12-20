@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "common/file_time.hpp"
 #include "common/point.hpp"
 #include "common/session.hpp"
-#include "common/time_utilities.hpp"
+#include "common/util/time.hpp"
 #include "common/wide_point.hpp"
 #include "channel_server/buffs.hpp"
 #include "channel_server/buffs_packet_helper.hpp"
@@ -157,7 +157,7 @@ PACKET_IMPL(portal_blocked, portal_blocked_reason reason) {
 	packet_builder builder;
 	builder
 		.add<packet_header>(SMSG_PORTAL_BLOCKED)
-		.unk<int8_t>((int8_t)reason);
+		.add<int8_t>(static_cast<int8_t>(reason));
 	return builder;
 }
 

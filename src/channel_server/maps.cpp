@@ -16,8 +16,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 #include "maps.hpp"
-#include "common/file_utilities.hpp"
 #include "common/packet_reader.hpp"
+#include "common/util/file.hpp"
 #include "channel_server/channel_server.hpp"
 #include "channel_server/instance.hpp"
 #include "channel_server/inventory.hpp"
@@ -56,7 +56,7 @@ auto maps::use_portal(ref_ptr<player> player, const data::type::portal_info * co
 
 		string filename = channel_server::get_instance().get_script_data_provider().build_script_path(data::type::script_type::portal, portal->script);
 
-		if (utilities::file::exists(filename)) {
+		if (vana::util::file::exists(filename)) {
 			lua::lua_portal lua_env = {filename, player->get_id(), player->get_map_id(), portal};
 
 			if (!lua_env.player_map_changed()) {
@@ -147,10 +147,10 @@ auto maps::use_portal(ref_ptr<player> player, packet_reader &reader) -> void {
 			const point portal_pos = portal->pos;
 
 			// Client-sided check; server uses an inaccurate check of 100 for each direction
-			rect possible_rect = rect(
+			rect possible_rect{
 				point{ portal_pos.x - 20, portal_pos.y - 50 },
 				point{ portal_pos.x + 20, portal_pos.y + 50 }
-			);
+			};
 
 			if (!possible_rect.contains(client_pos)) {
 				// Hacks

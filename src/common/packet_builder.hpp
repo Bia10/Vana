@@ -18,8 +18,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #pragma once
 
 #include "common/i_packet.hpp"
-#include "common/shared_array.hpp"
 #include "common/types.hpp"
+#include "common/util/shared_array.hpp"
 #include <cstring>
 #include <iostream>
 #include <limits>
@@ -109,6 +109,8 @@ namespace vana {
 		auto add_impl<minutes>(const minutes &val) -> void;
 		template <>
 		auto add_impl<hours>(const hours &val) -> void;
+		template <>
+		auto add_impl<packet_date>(const packet_date &val) -> void;
 		template <typename TElement>
 		auto add_impl(const vector<TElement> &val) -> void;
 
@@ -119,7 +121,7 @@ namespace vana {
 
 		size_t m_pos = 0;
 		size_t m_packet_capacity = 0;
-		utilities::misc::shared_array<unsigned char> m_packet;
+		vana::util::shared_array<unsigned char> m_packet;
 	};
 
 	template <typename TValue>
@@ -244,6 +246,16 @@ namespace vana {
 	template <>
 	auto packet_builder::add_impl<hours>(const hours &value) -> void {
 		add_impl_default<int32_t>(static_cast<int32_t>(value.count()));
+	}
+	
+	template <>
+	auto packet_builder::add_impl<packet_date>(const packet_date &val) -> void {
+		// The value will be YYYYMMDD
+		uint32_t yyymmdd = 
+			(val.day) +
+			(val.month * 100) +
+			(val.year * 10000);
+		add_impl_default<uint32_t>(yyymmdd);
 	}
 
 	template <>

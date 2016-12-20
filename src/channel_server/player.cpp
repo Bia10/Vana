@@ -18,17 +18,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "player.hpp"
 #include "common/common_header.hpp"
 #include "common/data/provider/item.hpp"
-#include "common/database.hpp"
-#include "common/enum_utilities.hpp"
-#include "common/game_logic_utilities.hpp"
+#include "common/io/database.hpp"
 #include "common/packet_builder.hpp"
 #include "common/packet_reader.hpp"
 #include "common/packet_wrapper.hpp"
-#include "common/randomizer.hpp"
 #include "common/session.hpp"
 #include "common/split_packet_builder.hpp"
-#include "common/string_utilities.hpp"
-#include "common/time_utilities.hpp"
+#include "common/util/enum_cast.hpp"
+#include "common/util/randomizer.hpp"
+#include "common/util/string.hpp"
+#include "common/util/time.hpp"
 #include "channel_server/buddy_list_handler.hpp"
 #include "channel_server/buddy_list_packet.hpp"
 #include "channel_server/channel_server.hpp"
@@ -197,7 +196,7 @@ auto player::handle(packet_reader &reader) -> result {
 		// We may not process the structure properly
 
 		reader.reset();
-		channel_server::get_instance().log(log_type::malformed_packet, [&](out_stream &log) {
+		channel_server::get_instance().log(vana::log::type::malformed_packet, [&](out_stream &log) {
 			log << "Player ID: " << get_id()
 				<< "; Packet: " << reader
 				<< "; Error: " << e.what();
@@ -206,7 +205,7 @@ auto player::handle(packet_reader &reader) -> result {
 		return result::failure;
 	}
 
-	return result::successful;
+	return result::success;
 }
 
 auto player::on_disconnect() -> void {
@@ -277,13 +276,13 @@ auto player::player_connect(packet_reader &reader) -> void {
 	}
 
 	m_id = id;
-	auto &db = database::get_char_db();
+	auto &db = vana::io::database::get_char_db();
 	auto &sql = db.get_session();
 	soci::row row;
 	sql.once
 		<< "SELECT c.*, u.gm_level, u.admin "
-		<< "FROM " << db.make_table("characters") << " c "
-		<< "INNER JOIN " << db.make_table("accounts") << " u ON c.account_id = u.account_id "
+		<< "FROM " << db.make_table(vana::table::characters) << " c "
+		<< "INNER JOIN " << db.make_table(vana::table::accounts) << " u ON c.account_id = u.account_id "
 		<< "WHERE c.character_id = :char",
 		soci::use(id, "char"),
 		soci::into(row);
@@ -423,7 +422,7 @@ auto player::player_connect(packet_reader &reader) -> void {
 	provider.add_player(shared_from_this());
 	maps::add_player(shared_from_this(), m_map);
 
-	channel.log(log_type::info, [&](out_stream &log) {
+	channel.log(vana::log::type::info, [&](out_stream &log) {
 		log << m_name << " (" << m_id << ") connected from " << get_ip();
 	});
 
@@ -590,7 +589,7 @@ auto player::change_key(packet_reader &reader) -> void {
 		for (int32_t i = 0; i < how_many; i++) {
 			int32_t pos = reader.get<int32_t>();
 			key_map_type type;
-			if (enum_utilities::try_cast_from_underlying(reader.get<int8_t>(), type) != result::successful) {
+			if (vana::util::enum_cast::try_cast_from_underlying(reader.get<int8_t>(), type) != result::success) {
 				// Probably hacking
 				return;
 			}
@@ -675,10 +674,10 @@ auto player::save_stats() -> void {
 		cover = raw_cover;
 	}
 
-	auto &db = database::get_char_db();
+	auto &db = vana::io::database::get_char_db();
 	auto &sql = db.get_session();
 	sql.once
-		<< "UPDATE " << db.make_table("characters") << " "
+		<< "UPDATE " << db.make_table(vana::table::characters) << " "
 		<< "SET "
 		<< "	level = :level, "
 		<< "	job = :job, "
@@ -756,11 +755,11 @@ auto player::save_all(bool save_cooldowns) -> void {
 
 auto player::set_online(bool online) -> void {
 	int32_t online_id = online ? channel_server::get_instance().get_online_id() : 0;
-	auto &db = database::get_char_db();
+	auto &db = vana::io::database::get_char_db();
 	auto &sql = db.get_session();
 	sql.once
-		<< "UPDATE " << db.make_table("accounts") << " u "
-		<< "INNER JOIN " << db.make_table("characters") << " c ON u.account_id = c.account_id "
+		<< "UPDATE " << db.make_table(vana::table::accounts) << " u "
+		<< "INNER JOIN " << db.make_table(vana::table::characters) << " c ON u.account_id = c.account_id "
 		<< "SET "
 		<< "	u.online = :online_id, "
 		<< "	c.online = :online "
@@ -771,9 +770,9 @@ auto player::set_online(bool online) -> void {
 }
 
 auto player::set_level_date() -> void {
-	auto &db = database::get_char_db();
+	auto &db = vana::io::database::get_char_db();
 	auto &sql = db.get_session();
-	sql.once << "UPDATE " << db.make_table("characters") << " c SET c.time_level = NOW() WHERE c.character_id = :char",
+	sql.once << "UPDATE " << db.make_table(vana::table::characters) << " c SET c.time_level = NOW() WHERE c.character_id = :char",
 		soci::use(m_id, "char");
 }
 
@@ -834,11 +833,11 @@ auto player::get_portal_count(bool add) -> game_portal_count {
 }
 
 auto player::initialize_rng(packet_builder &builder) -> void {
-	uint32_t seed1 = randomizer::rand<uint32_t>();
-	uint32_t seed2 = randomizer::rand<uint32_t>();
-	uint32_t seed3 = randomizer::rand<uint32_t>();
+	uint32_t seed1 = vana::util::randomizer::rand<uint32_t>();
+	uint32_t seed2 = vana::util::randomizer::rand<uint32_t>();
+	uint32_t seed3 = vana::util::randomizer::rand<uint32_t>();
 
-	m_rand_stream = make_owned_ptr<tausworthe_generator>(seed1, seed2, seed3);
+	m_rand_stream = make_owned_ptr<vana::util::tausworthe_generator>(seed1, seed2, seed3);
 
 	builder.add<uint32_t>(seed1);
 	builder.add<uint32_t>(seed2);

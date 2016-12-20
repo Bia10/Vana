@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "common/data/provider/shop.hpp"
 #include "common/packet_reader.hpp"
 #include "common/session.hpp"
+#include "common/util/game_logic/item.hpp"
 #include "channel_server/channel_server.hpp"
 #include "channel_server/maps.hpp"
 #include "channel_server/move_path.hpp"
@@ -62,7 +63,7 @@ PACKET_IMPL(control_npc, const data::type::npc_spawn_info &npc, game_map_object 
 	return builder;
 }
 
-PACKET_IMPL(animate_npc, game_map_object npc_id, uint8_t action1, uint8_t action2, const move_path* opt_path) {
+PACKET_IMPL(move_npc, game_map_object npc_id, uint8_t action1, uint8_t action2, const move_path &path) {
 	packet_builder builder;
 	builder
 		.add<packet_header>(SMSG_NPC_ANIMATE)
@@ -70,9 +71,18 @@ PACKET_IMPL(animate_npc, game_map_object npc_id, uint8_t action1, uint8_t action
 		.add<uint8_t>(action1)
 		.add<uint8_t>(action2);
 
-	if (opt_path != nullptr) {
-		opt_path->write_to_packet(builder);
-	}
+	path.write_to_packet(builder);
+
+	return builder;
+}
+
+PACKET_IMPL(animate_npc, game_map_object npc_id, uint8_t action1, uint8_t action2) {
+	packet_builder builder;
+	builder
+		.add<packet_header>(SMSG_NPC_ANIMATE)
+		.add<game_map_object>(npc_id)
+		.add<uint8_t>(action1)
+		.add<uint8_t>(action2);
 
 	return builder;
 }
@@ -110,7 +120,7 @@ PACKET_IMPL(show_shop, const shop_data &shop, game_slot_qty rechargeable_bonus) 
 			.add<game_item_id>(item->item_id)
 			.add<game_mesos>(item->price);
 
-		if (game_logic_utilities::is_rechargeable(item->item_id)) {
+		if (vana::util::game_logic::item::is_rechargeable(item->item_id)) {
 			items_added.emplace(item->item_id);
 			double cost = 0.0;
 			if (shop.rechargeables.size() > 0) {
@@ -127,7 +137,7 @@ PACKET_IMPL(show_shop, const shop_data &shop, game_slot_qty rechargeable_bonus) 
 		}
 		auto item_info = channel_server::get_instance().get_item_data_provider().get_item_info(item->item_id);
 		game_slot_qty max_slot = item_info->max_slot;
-		if (game_logic_utilities::is_rechargeable(item->item_id)) {
+		if (vana::util::game_logic::item::is_rechargeable(item->item_id)) {
 			max_slot += rechargeable_bonus;
 		}
 		builder.add<game_slot_qty>(max_slot);
@@ -148,12 +158,12 @@ PACKET_IMPL(show_shop, const shop_data &shop, game_slot_qty rechargeable_bonus) 
 	return builder;
 }
 
-PACKET_IMPL(npc_chat, int8_t type, game_map_object npc_id, const string &text, bool exclude_text) {
+PACKET_IMPL(npc_chat, int8_t type, game_npc_id npc_id, const string &text, bool exclude_text) {
 	packet_builder builder;
 	builder
 		.add<packet_header>(SMSG_NPC_TALK)
 		.add<int8_t>(4)
-		.add<game_map_object>(npc_id)
+		.add<game_npc_id>(npc_id)
 		.add<int8_t>(type);
 
 	if (!exclude_text) {
@@ -162,15 +172,14 @@ PACKET_IMPL(npc_chat, int8_t type, game_map_object npc_id, const string &text, b
 	return builder;
 }
 
-auto npc_set_script(hash_map<int32_t, string> scripts) -> vector<packet_builder> {
-
+auto npc_set_script(const hash_map<int32_t, string> scripts) -> vector<packet_builder> {
 	vector<packet_builder> output;
 	
 	packet_builder current_packet;
 	uint8_t written_scripts = 0;
 
-	for (auto &kvp : scripts) {
-		if (written_scripts == 254) {
+	for (const auto &kvp : scripts) {
+		if (written_scripts == UINT8_MAX) {
 			current_packet.set<uint8_t>(written_scripts, 2);
 			output.push_back(packet_builder{current_packet});
 			current_packet = {};
@@ -180,14 +189,14 @@ auto npc_set_script(hash_map<int32_t, string> scripts) -> vector<packet_builder>
 		if (written_scripts == 0) {
 			current_packet
 				.add<packet_header>(SMSG_NPC_SET_SCRIPT)
-				.add<uint8_t>(0);
+				.defer<uint8_t>();
 		}
 		
 		current_packet
-			.add<game_map_object>(kvp.first)
+			.add<game_npc_id>(kvp.first)
 			.add<string>(kvp.second)
-			.add<int32_t>(20010101) // Start and end date
-			.add<int32_t>(20240101);
+			.add<packet_date>({2001, 1, 1}) // Start and end date
+			.add<packet_date>({2091, 12, 31});
 
 		written_scripts++;
 	}
