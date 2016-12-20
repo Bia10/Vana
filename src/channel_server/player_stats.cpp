@@ -17,6 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 #include "player_stats.hpp"
 #include "common/algorithm.hpp"
+#include "common/data/type/player_stats_update.hpp"
 #include "common/data/provider/equip.hpp"
 #include "common/data/provider/skill.hpp"
 #include "common/inter_header.hpp"
@@ -208,7 +209,9 @@ auto player_stats::check_hp_mp() -> void {
 auto player_stats::set_level(game_player_level level) -> void {
 	m_level = level;
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::level, level));
+		data::type::player_stats_update updates;
+		updates.level = level;
+		player->send(packets::player::update_stat(updates, constant::stat::level));
 		player->send_map(packets::level_up(player->get_id()));
 		channel_server::get_instance().get_player_data_provider().update_player_level(player);
 	}
@@ -219,7 +222,9 @@ auto player_stats::set_hp(game_health hp, bool send_packet) -> void {
 	m_hp = ext::constrain_range<game_health>(hp, constant::stat::min_hp, get_max_hp());
 	if (send_packet) {
 		if (auto player = m_player.lock()) {
-			player->send(packets::player::update_stat(constant::stat::hp, m_hp));
+			data::type::player_stats_update updates;
+			updates.hp = m_hp;
+			player->send(packets::player::update_stat(updates, constant::stat::hp));
 		}
 		else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 	}
@@ -233,7 +238,9 @@ auto player_stats::modify_hp(int32_t hp_mod, bool send_packet) -> void {
 
 	if (send_packet) {
 		if (auto player = m_player.lock()) {
-			player->send(packets::player::update_stat(constant::stat::hp, m_hp));
+			data::type::player_stats_update updates;
+			updates.hp = m_hp;
+			player->send(packets::player::update_stat(updates, constant::stat::hp));
 		}
 		else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 	}
@@ -243,7 +250,9 @@ auto player_stats::modify_hp(int32_t hp_mod, bool send_packet) -> void {
 auto player_stats::damage_hp(int32_t damage_hp) -> void {
 	m_hp = std::max<int32_t>(constant::stat::min_hp, static_cast<int32_t>(m_hp) - damage_hp);
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::hp, m_hp));
+		data::type::player_stats_update updates;
+		updates.hp = m_hp;
+		player->send(packets::player::update_stat(updates, constant::stat::hp));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 	modified_hp();
@@ -273,7 +282,9 @@ auto player_stats::set_mp(game_health mp, bool send_packet) -> void {
 		if (!player->get_active_buffs()->has_infinity()) {
 			m_mp = ext::constrain_range<game_health>(mp, constant::stat::min_mp, get_max_mp());
 		}
-		player->send(packets::player::update_stat(constant::stat::mp, m_mp, send_packet));
+		data::type::player_stats_update updates;
+		updates.mp = m_mp;
+		player->send(packets::player::update_stat(updates, constant::stat::mp, send_packet));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -285,7 +296,9 @@ auto player_stats::modify_mp(int32_t mp_mod, bool send_packet) -> void {
 			temp_mp = ext::constrain_range<int32_t>(temp_mp, constant::stat::min_mp, get_max_mp());
 			m_mp = static_cast<game_health>(temp_mp);
 		}
-		player->send(packets::player::update_stat(constant::stat::mp, m_mp, send_packet));
+		data::type::player_stats_update updates;
+		updates.mp = m_mp;
+		player->send(packets::player::update_stat(updates, constant::stat::mp, send_packet));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -295,7 +308,9 @@ auto player_stats::damage_mp(int32_t damage_mp) -> void {
 		if (!player->get_active_buffs()->has_infinity()) {
 			m_mp = std::max<int32_t>(constant::stat::min_mp, static_cast<int32_t>(m_mp) - damage_mp);
 		}
-		player->send(packets::player::update_stat(constant::stat::mp, m_mp, false));
+		data::type::player_stats_update updates;
+		updates.mp = m_mp;
+		player->send(packets::player::update_stat(updates, constant::stat::mp));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -303,7 +318,9 @@ auto player_stats::damage_mp(int32_t damage_mp) -> void {
 auto player_stats::set_sp(game_stat sp) -> void {
 	m_sp = sp;
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::sp, sp));
+		data::type::player_stats_update updates;
+		updates.sp = m_sp;
+		player->send(packets::player::update_stat(updates, constant::stat::sp));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -311,7 +328,9 @@ auto player_stats::set_sp(game_stat sp) -> void {
 auto player_stats::set_ap(game_stat ap) -> void {
 	m_ap = ap;
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::ap, ap));
+		data::type::player_stats_update updates;
+		updates.ap = m_ap;
+		player->send(packets::player::update_stat(updates, constant::stat::ap));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -319,7 +338,9 @@ auto player_stats::set_ap(game_stat ap) -> void {
 auto player_stats::set_job(game_job_id job) -> void {
 	m_job = job;
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::job, job));
+		data::type::player_stats_update updates;
+		updates.job = m_job;
+		player->send(packets::player::update_stat(updates, constant::stat::job));
 		player->send_map(packets::job_change(player->get_id()));
 		channel_server::get_instance().get_player_data_provider().update_player_job(player);
 	}
@@ -329,7 +350,9 @@ auto player_stats::set_job(game_job_id job) -> void {
 auto player_stats::set_str(game_stat str) -> void {
 	m_str = str;
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::str, str));
+		data::type::player_stats_update updates;
+		updates.str = m_str;
+		player->send(packets::player::update_stat(updates, constant::stat::str));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -337,7 +360,9 @@ auto player_stats::set_str(game_stat str) -> void {
 auto player_stats::set_dex(game_stat dex) -> void {
 	m_dex = dex;
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::dex, dex));
+		data::type::player_stats_update updates;
+		updates.dex = m_dex;
+		player->send(packets::player::update_stat(updates, constant::stat::dex));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -345,7 +370,9 @@ auto player_stats::set_dex(game_stat dex) -> void {
 auto player_stats::set_int(game_stat intl) -> void {
 	m_int = intl;
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::intl, intl));
+		data::type::player_stats_update updates;
+		updates.intl = m_int;
+		player->send(packets::player::update_stat(updates, constant::stat::intl));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -353,7 +380,9 @@ auto player_stats::set_int(game_stat intl) -> void {
 auto player_stats::set_luk(game_stat luk) -> void {
 	m_luk = luk;
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::luk, luk));
+		data::type::player_stats_update updates;
+		updates.luk = m_luk;
+		player->send(packets::player::update_stat(updates, constant::stat::luk));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -372,7 +401,9 @@ auto player_stats::set_maple_warrior(int16_t mod) -> void {
 auto player_stats::set_max_hp(game_health max_hp) -> void {
 	m_max_hp = ext::constrain_range(max_hp, constant::stat::min_max_hp, constant::stat::max_max_hp);
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::max_hp, m_max_hp));
+		data::type::player_stats_update updates;
+		updates.max_hp = m_max_hp;
+		player->send(packets::player::update_stat(updates, constant::stat::max_hp));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 	modified_hp();
@@ -381,7 +412,9 @@ auto player_stats::set_max_hp(game_health max_hp) -> void {
 auto player_stats::set_max_mp(game_health max_mp) -> void {
 	m_max_mp = ext::constrain_range(max_mp, constant::stat::min_max_mp, constant::stat::max_max_mp);
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::max_mp, m_max_mp));
+		data::type::player_stats_update updates;
+		updates.max_mp = m_max_mp;
+		player->send(packets::player::update_stat(updates, constant::stat::max_mp));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -390,7 +423,9 @@ auto player_stats::set_hyper_body_hp(int16_t mod) -> void {
 	m_hyper_body_x = mod;
 	m_buff_bonuses.hp = std::min<uint16_t>((m_max_hp + m_equip_bonuses.hp) * mod / 100, constant::stat::max_max_hp);
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::max_hp, m_max_hp));
+		data::type::player_stats_update updates;
+		updates.max_hp = m_max_hp;
+		player->send(packets::player::update_stat(updates, constant::stat::max_hp));
 		if (mod == 0) {
 			set_hp(get_hp());
 		}
@@ -406,7 +441,9 @@ auto player_stats::set_hyper_body_mp(int16_t mod) -> void {
 	m_hyper_body_y = mod;
 	m_buff_bonuses.mp = std::min<uint16_t>((m_max_mp + m_equip_bonuses.mp) * mod / 100, constant::stat::max_max_mp);
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::max_mp, m_max_mp));
+		data::type::player_stats_update updates;
+		updates.max_mp = m_max_mp;
+		player->send(packets::player::update_stat(updates, constant::stat::max_mp));
 		if (mod == 0) {
 			set_mp(get_mp());
 		}
@@ -417,7 +454,9 @@ auto player_stats::set_hyper_body_mp(int16_t mod) -> void {
 auto player_stats::modify_max_hp(game_health mod) -> void {
 	m_max_hp = std::min<game_health>(m_max_hp + mod, constant::stat::max_max_hp);
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::max_hp, m_max_hp));
+		data::type::player_stats_update updates;
+		updates.max_hp = m_max_hp;
+		player->send(packets::player::update_stat(updates, constant::stat::max_hp));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -425,7 +464,9 @@ auto player_stats::modify_max_hp(game_health mod) -> void {
 auto player_stats::modify_max_mp(game_health mod) -> void {
 	m_max_mp = std::min<game_health>(m_max_mp + mod, constant::stat::max_max_mp);
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::max_mp, m_max_mp));
+		data::type::player_stats_update updates;
+		updates.max_mp = m_max_mp;
+		player->send(packets::player::update_stat(updates, constant::stat::max_mp));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -433,7 +474,9 @@ auto player_stats::modify_max_mp(game_health mod) -> void {
 auto player_stats::set_exp(game_experience exp) -> void {
 	m_exp = std::max(exp, 0);
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::exp, m_exp));
+		data::type::player_stats_update updates;
+		updates.exp = m_exp;
+		player->send(packets::player::update_stat(updates, constant::stat::exp));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -441,7 +484,9 @@ auto player_stats::set_exp(game_experience exp) -> void {
 auto player_stats::set_fame(game_fame fame) -> void {
 	m_fame = ext::constrain_range(fame, constant::stat::min_fame, constant::stat::max_fame);
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::fame, fame));
+		data::type::player_stats_update updates;
+		updates.fame = m_fame;
+		player->send(packets::player::update_stat(updates, constant::stat::fame));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }

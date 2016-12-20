@@ -627,17 +627,23 @@ auto player::change_skill_macros(packet_reader &reader) -> void {
 
 auto player::set_hair(game_hair_id id) -> void {
 	m_hair = id;
-	send(packets::player::update_stat(constant::stat::hair, id));
+	data::type::player_stats_update updates;
+	updates.hair = m_hair;
+	send(packets::player::update_stat(updates, constant::stat::hair));
 }
 
 auto player::set_face(game_face_id id) -> void {
 	m_face = id;
-	send(packets::player::update_stat(constant::stat::face, id));
+	data::type::player_stats_update updates;
+	updates.face = m_face;
+	send(packets::player::update_stat(updates, constant::stat::face));
 }
 
 auto player::set_skin(game_skin_id id) -> void {
 	m_skin = id;
-	send(packets::player::update_stat(constant::stat::skin, id));
+	data::type::player_stats_update updates;
+	updates.skin = m_skin;
+	send(packets::player::update_stat(updates, constant::stat::skin));
 }
 
 auto player::save_stats() -> void {

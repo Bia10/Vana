@@ -180,7 +180,9 @@ auto player_inventory::add_max_slots(game_inventory inventory, game_inventory_sl
 auto player_inventory::set_mesos(game_mesos mesos, bool send_packet) -> void {
 	m_mesos.set_mesos(mesos);
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::mesos, m_mesos.get_mesos(), send_packet));
+		data::type::player_stats_update updates;
+		updates.mesos = m_mesos.get_mesos();
+		player->send(packets::player::update_stat(updates, constant::stat::mesos, send_packet));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
@@ -203,7 +205,9 @@ auto player_inventory::modify_mesos_internal(vana::util::meso_modify_result quer
 	}
 
 	if (auto player = m_player.lock()) {
-		player->send(packets::player::update_stat(constant::stat::mesos, query.get_final_amount(), send_packet));
+		data::type::player_stats_update updates;
+		updates.mesos = query.get_final_amount();
+		player->send(packets::player::update_stat(updates, constant::stat::mesos, send_packet));
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 

@@ -90,9 +90,6 @@
     <ClCompile Include="src\common\session.cpp">
       <Filter>Connection</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\decoder.cpp">
-      <Filter>Source\Connection</Filter>
-    </ClCompile>
     <ClCompile Include="src\common\quest.cpp">
       <Filter>Data Structures</Filter>
     </ClCompile>
@@ -304,9 +301,6 @@
     </ClInclude>
     <ClInclude Include="src\common\session.hpp">
       <Filter>Connection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\common\decoder.hpp">
-      <Filter>Source\Connection</Filter>
     </ClInclude>
     <ClInclude Include="src\common\quest.hpp">
       <Filter>Data Structures</Filter>
@@ -970,6 +964,9 @@
     </ClInclude>
     <ClInclude Include="src\common\io\version_check_result.hpp">
       <Filter>io</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\data\type\player_stats_update.hpp">
+      <Filter>data\type</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

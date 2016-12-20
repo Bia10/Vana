@@ -156,40 +156,70 @@ PACKET_IMPL(show_skill_macros, skill_macros *macros) {
 	return builder;
 }
 
-PACKET_IMPL(update_stat, int32_t update_bits, int32_t value, bool item_response) {
+auto encode_player_stats(const data::type::player_stats_update &stats, uint32_t update_bits) -> packet_builder {
+	packet_builder builder;
+	builder.add<uint32_t>(update_bits);
+	
+	if (update_bits & constant::stat::skin)
+		builder.add<game_skin_id>(stats.skin);
+	if (update_bits & constant::stat::face)
+		builder.add<game_face_id>(stats.face);
+	if (update_bits & constant::stat::hair)
+		builder.add<game_hair_id>(stats.hair);
+	if (update_bits & constant::stat::pet_1)
+		builder.add<game_pet_id>(stats.pet_1);
+	if (update_bits & constant::stat::pet_2)
+		builder.add<game_pet_id>(stats.pet_2);
+	if (update_bits & constant::stat::pet_3)
+		builder.add<game_pet_id>(stats.pet_3);
+	if (update_bits & constant::stat::level)
+		builder.add<game_player_level>(stats.level);
+	if (update_bits & constant::stat::job)
+		builder.add<game_job_id>(stats.job);
+	if (update_bits & constant::stat::str)
+		builder.add<game_stat>(stats.str);
+	if (update_bits & constant::stat::dex)
+		builder.add<game_stat>(stats.dex);
+	if (update_bits & constant::stat::intl)
+		builder.add<game_stat>(stats.intl);
+	if (update_bits & constant::stat::luk)
+		builder.add<game_stat>(stats.luk);
+	if (update_bits & constant::stat::hp)
+		builder.add<game_health>(stats.hp);
+	if (update_bits & constant::stat::max_hp)
+		builder.add<game_health>(stats.max_hp);
+	if (update_bits & constant::stat::mp)
+		builder.add<game_health>(stats.mp);
+	if (update_bits & constant::stat::max_mp)
+		builder.add<game_health>(stats.max_mp);
+	if (update_bits & constant::stat::ap)
+		builder.add<game_stat>(stats.ap);
+	if (update_bits & constant::stat::sp)
+		builder.add<game_stat>(stats.sp);
+	if (update_bits & constant::stat::exp)
+		builder.add<game_experience>(stats.exp);
+	if (update_bits & constant::stat::fame)
+		builder.add<game_fame>(stats.fame);
+	if (update_bits & constant::stat::mesos)
+		builder.add<game_mesos>(stats.mesos);
+
+	if (update_bits & constant::stat::unk_3)
+		builder.unk<int32_t>();
+
+	return builder;
+}
+
+PACKET_IMPL(update_stat, const data::type::player_stats_update &stats, uint32_t update_bits, bool item_response) {
 	packet_builder builder;
 	builder
 		.add<packet_header>(SMSG_PLAYER_UPDATE)
-		.add<bool>(item_response)
-		.add<int32_t>(update_bits);
+		.add<bool>(item_response);
 
-	switch (update_bits) {
-		// For now it only accepts updateBits as a single unit, might be a collection later
-		case constant::stat::pet:
-		case constant::stat::level:
-		case constant::stat::job:
-		case constant::stat::str:
-		case constant::stat::dex:
-		case constant::stat::intl:
-		case constant::stat::luk:
-		case constant::stat::hp:
-		case constant::stat::max_hp:
-		case constant::stat::mp:
-		case constant::stat::max_mp:
-		case constant::stat::ap:
-		case constant::stat::sp:
-			builder.add<int16_t>(static_cast<int16_t>(value));
-			break;
-		case constant::stat::skin:
-		case constant::stat::face:
-		case constant::stat::hair:
-		case constant::stat::exp:
-		case constant::stat::fame:
-		case constant::stat::mesos:
-			builder.add<int32_t>(value);
-			break;
-	}
-	builder.add<int32_t>(value);
+	builder.add_buffer(encode_player_stats(stats, update_bits));
+
+	if (update_bits & constant::stat::pet_flags)
+		builder.unk<int8_t>();
+
 	return builder;
 }
 

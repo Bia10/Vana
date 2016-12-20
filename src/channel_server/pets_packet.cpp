@@ -155,8 +155,7 @@ PACKET_IMPL(update_summoned_pets, ref_ptr<player> player) {
 	builder
 		.add<packet_header>(SMSG_PLAYER_UPDATE)
 		.add<int8_t>(0)
-		.add<int16_t>(constant::stat::pet)
-		.add<int16_t>(0x18);
+		.add<uint32_t>(constant::stat::pet_flags);
 
 	for (int8_t i = 0; i < constant::inventory::max_pet_count; i++) {
 		if (pet *pet = player->get_pets()->get_summoned(i)) {

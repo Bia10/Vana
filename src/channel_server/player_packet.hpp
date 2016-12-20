@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "common/ip.hpp"
 #include "common/packet_builder.hpp"
 #include "common/types.hpp"
+#include "common/data/type/player_stats_update.hpp"
 #include <string>
 
 namespace vana {
@@ -53,7 +54,8 @@ namespace vana {
 				PACKET(connect_data, ref_ptr<vana::channel_server::player> player);
 				PACKET(show_keys, key_maps *keymaps);
 				PACKET(show_skill_macros, skill_macros *macros);
-				PACKET(update_stat, int32_t update_bits, int32_t value, bool item_response = false);
+				auto encode_player_stats(const data::type::player_stats_update &stats, uint32_t update_bits) -> packet_builder;
+				PACKET(update_stat, const data::type::player_stats_update &stats, uint32_t update_bits, bool item_response = false);
 				PACKET(change_channel, const ip &ip, connection_port port);
 				PACKET(show_message, const game_chat &msg, int8_t type);
 				PACKET(group_chat, const string &name, const game_chat &msg, int8_t type);

@@ -173,25 +173,35 @@ namespace vana {
 			}
 
 			enum constants : int32_t {
-				skin = 0x01,
-				face = 0x02,
-				hair = 0x04,
-				pet = 0x08,
-				level = 0x10,
-				job = 0x20,
-				str = 0x40,
-				dex = 0x80,
-				intl = 0x100,
-				luk = 0x200,
-				hp = 0x400,
-				max_hp = 0x800,
-				mp = 0x1000,
-				max_mp = 0x2000,
-				ap = 0x4000,
-				sp = 0x8000,
-				exp = 0x10000,
-				fame = 0x20000,
-				mesos = 0x40000,
+				// byte 0
+				skin = 0x00000001,
+				face = 0x00000002,
+				hair = 0x00000004,
+				pet_1 = 0x00000008,
+				level = 0x00000010,
+				job = 0x00000020,
+				str = 0x00000040,
+				dex = 0x00000080,
+				// byte 1
+				intl = 0x00000100,
+				luk = 0x00000200,
+				hp = 0x00000400,
+				max_hp = 0x00000800,
+				mp = 0x00001000,
+				max_mp = 0x00002000,
+				ap = 0x00004000,
+				sp = 0x00008000,
+				// byte 2
+				exp = 0x00010000,
+				fame = 0x00020000,
+				mesos = 0x00040000,
+				pet_2 = 0x00080000,
+				pet_3 = 0x00100000,
+				unk_3 = 0x00200000,
+
+				// Combined flags
+
+				pet_flags = pet_1 | pet_2 | pet_3,
 			};
 		}
 	}

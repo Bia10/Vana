@@ -256,6 +256,7 @@
     <ClInclude Include="src\common\data\type\npc_info.hpp" />
     <ClInclude Include="src\common\data\type\pet_info.hpp" />
     <ClInclude Include="src\common\data\type\pet_interact_info.hpp" />
+    <ClInclude Include="src\common\data\type\player_stats_update.hpp" />
     <ClInclude Include="src\common\data\type\portal_info.hpp" />
     <ClInclude Include="src\common\data\type\quest_request_info.hpp" />
     <ClInclude Include="src\common\data\type\quest_reward_info.hpp" />
