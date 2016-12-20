@@ -92,15 +92,15 @@ auto reactor_handler::hit_reactor(ref_ptr<player> player, packet_reader &reader)
 			
 			filename = channel.get_script_data_provider().build_script_path(
 				data::type::script_type::reactor,
-				utilities::str::lexical_cast<string>(reactor->get_reactor_id())
+				util::str::lexical_cast<string>(reactor->get_reactor_id())
 			);
 
-			if (utilities::file::exists(filename)) {
+			if (util::file::exists(filename)) {
 				lua::lua_reactor{filename, player->get_id(), id, reactor->get_map_id()};
 			}
 #ifdef _DEBUG
 			else {
-				channel.log(log_type::debug_error, "Missing reactor change state script '" + filename + "'");
+				channel.log(log::type::debug_error, "Missing reactor change state script '" + filename + "'");
 			}
 #endif
 

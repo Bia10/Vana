@@ -1434,7 +1434,7 @@ auto map::create_kite(ref_ptr<player> player, game_item_id item_id, const string
 	game_map_object id = m_object_ids.lease();
 
 	new_kite->set_id(id);
-	new_kite->set_spawned_at_time(utilities::time::get_now());
+	new_kite->set_spawned_at_time(util::time::get_now());
 
 	m_kites[id] = new_kite;
 	send(packets::spawn_kite(new_kite));

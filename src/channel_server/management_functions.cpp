@@ -827,7 +827,7 @@ auto management_functions::packet(ref_ptr<player> player, const game_chat &args)
 				(character >= '0' && character <= '9');
 	};
 
-	using utilities::str::lexical_cast;
+	using vana::util::str::lexical_cast;
 	if (!args.empty()) {
 		// Build packet
 		packet_builder packet;
@@ -862,7 +862,7 @@ auto management_functions::packet(ref_ptr<player> player, const game_chat &args)
 				int64_t value = 0;
 				if (string_length != 0) {
 					value_string = args.substr(i + 1, string_length - 1);
-					value = utilities::str::atoli(value_string.c_str());
+					value = util::str::atoli(value_string.c_str());
 				}
 
 				if (character == 'l') {
@@ -948,7 +948,7 @@ auto management_functions::packet(ref_ptr<player> player, const game_chat &args)
 			return chat_result::show_syntax;
 		}
 
-		channel_server::get_instance().log(log_type::gm_command, [&](out_stream &log) {
+		channel_server::get_instance().log(log::type::gm_command, [&](out_stream &log) {
 			log << "GM " << player->get_name()
 				<< " sent packet to self: " << std::endl
 				<< "raw: " << packet << std::endl

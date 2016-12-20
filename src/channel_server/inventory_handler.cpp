@@ -740,7 +740,7 @@ auto inventory_handler::use_cash_item(ref_ptr<player> player, packet_reader &rea
 				break;
 #ifdef _DEBUG
 			default:
-				channel_server::get_instance().log(log_type::debug_error, "Unhandled cash item " + std::to_string(item_id));
+				channel_server::get_instance().log(log::type::debug_error, "Unhandled cash item " + std::to_string(item_id));
 #endif
 		}
 	}
@@ -1049,7 +1049,7 @@ auto inventory_handler::handle_bridle_item(ref_ptr<player> player, packet_reader
 	
 	item *item = player->get_inventory()->get_item(constant::inventory::use, slot);
 	if (item == nullptr || item->get_id() != item_id ||
-		game_logic_utilities::get_item_type(item_id) != constant::item::type::item_bridle) {
+		vana::util::game_logic::item::get_item_type(item_id) != constant::item::type::item_bridle) {
 		// Hacking or hacking failure
 		player->send(packets::inventory::blank_update());
 		return;
