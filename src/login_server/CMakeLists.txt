@@ -1,7 +1,9 @@
-file(GLOB LOGIN_SRC *.cpp)
-file(GLOB LOGIN_HDR *.hpp)
+file(GLOB_RECURSE LOGIN_SRC **/*.cpp)
+file(GLOB_RECURSE LOGIN_HDR **/*.hpp)
 source_group("Login Sources" FILES ${LOGIN_SRC})
 source_group("Login Headers" FILES ${LOGIN_HDR})
+
+include_directories(../)
 
 add_executable(login_server ${LOGIN_SRC} ${LOGIN_HDR})
 

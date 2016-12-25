@@ -79,7 +79,7 @@ namespace vana {
 
 		template <typename TValue>
 		auto add_impl_default(const TValue &value) -> void;
-		template <>
+		template <typename TValue>
 		auto add_impl<bool>(const bool &val) -> void;
 		template <>
 		auto add_impl<double>(const double &val) -> void;

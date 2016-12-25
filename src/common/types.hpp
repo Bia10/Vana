@@ -348,13 +348,13 @@ namespace vana {
 
 	// Indicates that a code path is not implemented (intentionally) and there is a programming error afoot.
 	// Most frequently used with switch-cases on enumerations.
-	CODE_EXCEPTION(not_implemented_exception, std::exception);
+	CODE_EXCEPTION(not_implemented_exception, std::runtime_error);
 
 	// Indicates that generally, some operation has caused an invalid code path to manifest.
 	// It may be the result of invalid input or improper usage and the programmer should review to see which.
-	CODE_EXCEPTION(invalid_operation_exception, std::exception);
+	CODE_EXCEPTION(invalid_operation_exception, std::runtime_error);
 
 	// Indicates that specifically, this code path was never expected to be hit and there is a problem the programmer must address.
 	// Typically this will be high-level invariants that can't be expressed at an API level such as "a user connection will always have a world ID if they make it to character creation."
-	CODE_EXCEPTION(codepath_invalid_exception, std::exception);
+	CODE_EXCEPTION(codepath_invalid_exception, std::runtime_error);
 }
