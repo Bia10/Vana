@@ -32,7 +32,7 @@ PACKET_IMPL(show_drop, drop *drop, drop_spawn_types type, const point &origin, u
 	packet_builder builder;
 	builder
 		.add<packet_header>(SMSG_DROP_ITEM)
-		.add<int8_t>((int8_t)type)
+		.add<int8_t>(static_cast<int8_t>(type))
 		.add<game_map_object>(drop->get_id())
 		.add<bool>(drop->is_mesos())
 		.add<int32_t>(drop->get_object_id())
@@ -72,7 +72,7 @@ PACKET_IMPL(remove_drop, game_map_object drop_id, drop_despawn_types type, game_
 	packet_builder builder;
 	builder
 		.add<packet_header>(SMSG_DROP_PICKUP)
-		.add<int8_t>((int8_t)type)
+		.add<int8_t>(static_cast<int8_t>(type))
 		.add<game_map_object>(drop_id);
 
 	switch (type) {
@@ -101,7 +101,7 @@ PACKET_IMPL(explode_drop, game_map_object drop_id, int16_t delay) {
 	packet_builder builder;
 	builder
 		.add<packet_header>(SMSG_DROP_PICKUP)
-		.add<int8_t>((int8_t)drop_despawn_types::explode)
+		.add<int8_t>(static_cast<int8_t>(drop_despawn_types::explode))
 		.add<game_map_object>(drop_id)
 		.add<int16_t>(delay);
 	return builder;

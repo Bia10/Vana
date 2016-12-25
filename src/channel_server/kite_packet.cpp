@@ -39,7 +39,7 @@ PACKET_IMPL(despawn_kite, kite *kite, kite_despawn_reason reason) {
 	packet_builder builder;
 	builder
 		.add<packet_header>(SMSG_KITE_DESPAWN)
-		.add<int8_t>((int8_t)reason)
+		.add<int8_t>(static_cast<int8_t>(reason))
 		.add<game_map_object>(kite->get_id());
 	return builder;
 }
