@@ -61,10 +61,8 @@ namespace vana {
 		template <typename TValue>
 		auto skip_impl(TValue *) -> void;
 		template <>
-    inline
 		auto skip_impl<bool>(bool *) -> void;
 		template <>
-    inline
 		auto skip_impl<string>(string *) -> void;
 		template <typename TElement>
 		auto skip_impl(vector<TElement> *) -> void;
@@ -77,55 +75,39 @@ namespace vana {
 		template <typename TValue>
 		auto get_impl_default() -> TValue;
 		template <>
-    inline
 		auto get_impl<bool>(bool *) -> bool;
 		template <>
-    inline
 		auto get_impl<double>(double *) -> double;
 		template <>
-    inline
 		auto get_impl<string>(string *) -> string;
 		template <>
-    inline
 		auto get_impl<int8_t>(int8_t *) -> int8_t;
 		template <>
-    inline
 		auto get_impl<int16_t>(int16_t *) -> int16_t;
 		template <>
-    inline
 		auto get_impl<int32_t>(int32_t *) -> int32_t;
 		template <>
-    inline
 		auto get_impl<int64_t>(int64_t *) -> int64_t;
 		template <>
-    inline
 		auto get_impl<uint8_t>(uint8_t *) -> uint8_t;
 		template <>
-    inline
 		auto get_impl<uint16_t>(uint16_t *) -> uint16_t;
 		template <>
-    inline
 		auto get_impl<uint32_t>(uint32_t *) -> uint32_t;
 		template <>
-    inline
 		auto get_impl<uint64_t>(uint64_t *) -> uint64_t;
 		template <>
-    inline
 		auto get_impl<milliseconds>(milliseconds *) -> milliseconds;
 		template <>
-    inline
 		auto get_impl<seconds>(seconds *) -> seconds;
 		template <>
-    inline
 		auto get_impl<minutes>(minutes *) -> minutes;
 		template <>
-    inline
 		auto get_impl<hours>(hours *) -> hours;
 		template <typename TElement>
 		auto get_impl(vector<TElement> *) -> vector<TElement>;
 
 		template <>
-    inline
 		auto get_sized_impl<string>(size_t size, string *) -> string;
 		template <typename TElement>
 		auto get_sized_impl(size_t size, vector<TElement> *) -> vector<TElement>;
@@ -173,13 +155,11 @@ namespace vana {
 	}
 
 	template <>
-    inline
 	auto packet_reader::skip_impl<bool>(bool *) -> void {
 		m_pos += 1;
 	}
 
 	template <>
-    inline
 	auto packet_reader::skip_impl<string>(string *) -> void {
 		size_t length = get<uint16_t>();
 		m_pos += length;
@@ -214,7 +194,6 @@ namespace vana {
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<bool>(bool *) -> bool {
 	#ifdef DEBUG
 		// Address programming errors in debug
@@ -227,85 +206,71 @@ namespace vana {
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<double>(double *) -> double {
 		return get_impl_default<double>();
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<int8_t>(int8_t *) -> int8_t {
 		return get_impl_default<int8_t>();
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<int16_t>(int16_t *) -> int16_t {
 		return get_impl_default<int16_t>();
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<int32_t>(int32_t *) -> int32_t {
 		return get_impl_default<int32_t>();
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<int64_t>(int64_t *) -> int64_t {
 		return get_impl_default<int64_t>();
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<uint8_t>(uint8_t *) -> uint8_t {
 		return get_impl_default<uint8_t>();
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<uint16_t>(uint16_t *) -> uint16_t {
 		return get_impl_default<uint16_t>();
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<uint32_t>(uint32_t *) -> uint32_t {
 		return get_impl_default<uint32_t>();
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<uint64_t>(uint64_t *) -> uint64_t {
 		return get_impl_default<uint64_t>();
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<milliseconds>(milliseconds *) -> milliseconds {
 		return milliseconds{get_impl_default<int32_t>()};
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<seconds>(seconds *) -> seconds {
 		return seconds{get_impl_default<int32_t>()};
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<minutes>(minutes *) -> minutes {
 		return minutes{get_impl_default<int32_t>()};
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<hours>(hours *) -> hours {
 		return hours{get_impl_default<int32_t>()};
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_impl<string>(string *) -> string {
 		size_t size = get_impl_default<uint16_t>();
 		return get<string>(size);
@@ -318,7 +283,6 @@ namespace vana {
 	}
 
 	template <>
-    inline
 	auto packet_reader::get_sized_impl<string>(size_t size, string *) -> string {
 		if (size > get_buffer_length()) {
 			throw packet_content_exception{"Packet string longer than buffer allows"};

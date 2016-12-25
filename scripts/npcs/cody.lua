@@ -1,0 +1,2 @@
+addText("hai");
+sendNext();

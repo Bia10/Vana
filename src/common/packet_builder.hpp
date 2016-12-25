@@ -79,58 +79,42 @@ namespace vana {
 
 		template <typename TValue>
 		auto add_impl_default(const TValue &value) -> void;
-		template <typename TValue>
-		auto add_impl<bool>(const bool &val) -> void;
-		template <>
-    inline
-		auto add_impl<double>(const double &val) -> void;
-		template <>
-    inline
-		auto add_impl<string>(const string &val) -> void;
-		template <>
-    inline
-		auto add_impl<int8_t>(const int8_t &val) -> void;
-		template <>
-    inline
-		auto add_impl<int16_t>(const int16_t &val) -> void;
-		template <>
-    inline
-		auto add_impl<int32_t>(const int32_t &val) -> void;
-		template <>
-    inline
-		auto add_impl<int64_t>(const int64_t &val) -> void;
-		template <>
-    inline
-		auto add_impl<uint8_t>(const uint8_t &val) -> void;
-		template <>
-    inline
-		auto add_impl<uint16_t>(const uint16_t &val) -> void;
-		template <>
-    inline
-		auto add_impl<uint32_t>(const uint32_t &val) -> void;
-		template <>
-    inline
-		auto add_impl<uint64_t>(const uint64_t &val) -> void;
-		template <>
-    inline
-		auto add_impl<milliseconds>(const milliseconds &val) -> void;
-		template <>
-    inline
-		auto add_impl<seconds>(const seconds &val) -> void;
-		template <>
-    inline
-		auto add_impl<minutes>(const minutes &val) -> void;
-		template <>
-    inline
-		auto add_impl<hours>(const hours &val) -> void;
-		template <>
-    inline
-		auto add_impl<packet_date>(const packet_date &val) -> void;
 		template <typename TElement>
 		auto add_impl(const vector<TElement> &val) -> void;
+		template <>
+		auto add_impl<bool>(const bool &val) -> void;
+		template <>
+		auto add_impl<double>(const double &val) -> void;
+		template <>
+		auto add_impl<string>(const string &val) -> void;
+		template <>
+		auto add_impl<int8_t>(const int8_t &val) -> void;
+		template <>
+		auto add_impl<int16_t>(const int16_t &val) -> void;
+		template <>
+		auto add_impl<int32_t>(const int32_t &val) -> void;
+		template <>
+		auto add_impl<int64_t>(const int64_t &val) -> void;
+		template <>
+		auto add_impl<uint8_t>(const uint8_t &val) -> void;
+		template <>
+		auto add_impl<uint16_t>(const uint16_t &val) -> void;
+		template <>
+		auto add_impl<uint32_t>(const uint32_t &val) -> void;
+		template <>
+		auto add_impl<uint64_t>(const uint64_t &val) -> void;
+		template <>
+		auto add_impl<milliseconds>(const milliseconds &val) -> void;
+		template <>
+		auto add_impl<seconds>(const seconds &val) -> void;
+		template <>
+		auto add_impl<minutes>(const minutes &val) -> void;
+		template <>
+		auto add_impl<hours>(const hours &val) -> void;
+		template <>
+		auto add_impl<packet_date>(const packet_date &val) -> void;
 
 		template <>
-    inline
 		auto add_sized_impl<string>(const string &val, size_t size) -> void;
 		template <typename TElement>
 		auto add_sized_impl(const vector<TElement> &val, size_t size) -> void;
@@ -139,6 +123,9 @@ namespace vana {
 		size_t m_packet_capacity = 0;
 		vana::util::shared_array<unsigned char> m_packet;
 	};
+}
+// Fix GCC, maybe.?
+namespace vana {
 
 	template <typename TValue>
 	auto packet_builder::add(const TValue &value) -> packet_builder & {
@@ -171,6 +158,12 @@ namespace vana {
 	}
 
 	template <typename TValue>
+	auto packet_builder::set(const TValue &value, size_t pos) -> packet_builder & {
+		*reinterpret_cast<TValue *>(get_buffer(pos, sizeof(TValue))) = value;
+		return *this;
+	}
+
+	template <typename TValue>
 	auto packet_builder::add_impl(const TValue &val) -> void {
 		packet_serialize<TValue> x;
 		return x.write(*this, val);
@@ -188,98 +181,83 @@ namespace vana {
 		m_pos += sizeof(TValue);
 	}
 
-	template <typename TValue>
-	auto packet_builder::set(const TValue &value, size_t pos) -> packet_builder & {
-		*reinterpret_cast<TValue *>(get_buffer(pos, sizeof(TValue))) = value;
-		return *this;
+	template <typename TElement>
+	auto packet_builder::add_impl(const vector<TElement> &value) -> void {
+		add_impl_default<uint32_t>(value.size());
+		add<vector<TElement>>(value, value.size());
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<bool>(const bool &value) -> void {
 		add_impl_default<int8_t>(value ? 1 : 0);
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<double>(const double &value) -> void {
 		add_impl_default<double>(value);
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<int8_t>(const int8_t &value) -> void {
 		add_impl_default<int8_t>(value);
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<int16_t>(const int16_t &value) -> void {
 		add_impl_default<int16_t>(value);
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<int32_t>(const int32_t &value) -> void {
 		add_impl_default<int32_t>(value);
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<int64_t>(const int64_t &value) -> void {
 		add_impl_default<int64_t>(value);
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<uint8_t>(const uint8_t &value) -> void {
 		add_impl_default<uint8_t>(value);
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<uint16_t>(const uint16_t &value) -> void {
 		add_impl_default<uint16_t>(value);
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<uint32_t>(const uint32_t &value) -> void {
 		add_impl_default<uint32_t>(value);
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<uint64_t>(const uint64_t &value) -> void {
 		add_impl_default<uint64_t>(value);
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<milliseconds>(const milliseconds &value) -> void {
 		add_impl_default<int32_t>(static_cast<int32_t>(value.count()));
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<seconds>(const seconds &value) -> void {
 		add_impl_default<int32_t>(static_cast<int32_t>(value.count()));
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<minutes>(const minutes &value) -> void {
 		add_impl_default<int32_t>(static_cast<int32_t>(value.count()));
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<hours>(const hours &value) -> void {
 		add_impl_default<int32_t>(static_cast<int32_t>(value.count()));
 	}
 	
 	template <>
-    inline
 	auto packet_builder::add_impl<packet_date>(const packet_date &val) -> void {
 		// The value will be YYYYMMDD
 		uint32_t yyymmdd = 
@@ -290,21 +268,13 @@ namespace vana {
 	}
 
 	template <>
-    inline
 	auto packet_builder::add_impl<string>(const string &value) -> void {
 		if (value.size() > static_cast<size_t>(std::numeric_limits<uint16_t>::max())) throw std::invalid_argument{"String is too large to be sent via packet"};
 		add_impl_default<uint16_t>(static_cast<uint16_t>(value.size()));
 		add<string>(value, value.size());
 	}
 
-	template <typename TElement>
-	auto packet_builder::add_impl(const vector<TElement> &value) -> void {
-		add_impl_default<uint32_t>(value.size());
-		add<vector<TElement>>(value, value.size());
-	}
-
 	template <>
-    inline
 	auto packet_builder::add_sized_impl<string>(const string &value, size_t size) -> void {
 		size_t slen = value.size();
 		if (size < slen) {
