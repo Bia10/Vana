@@ -65,15 +65,12 @@ namespace vana {
 		auto skip_impl<bool>(bool *) -> void;
 		template <>
 		auto skip_impl<string>(string *) -> void;
-		template <typename TElement>
-		auto skip_impl(vector<TElement> *) -> void;
 #endif
 
 		template <typename TValue>
 		auto get_impl(TValue *) -> TValue;
 		template <typename TValue>
 		auto get_sized_impl(size_t size, TValue *) -> TValue;
-
 		template <typename TValue>
 		auto get_impl_default() -> TValue;
 
@@ -108,14 +105,21 @@ namespace vana {
 		auto get_impl<minutes>(minutes *) -> minutes;
 		template <>
 		auto get_impl<hours>(hours *) -> hours;
-		template <typename TElement>
-		auto get_impl(vector<TElement> *) -> vector<TElement>;
 
 		template <>
 		auto get_sized_impl<string>(size_t size, string *) -> string;
+#endif
+
+		// std::vector related implementations
+		
+		template <typename TElement>
+		auto skip_impl(vector<TElement> *) -> void;
+		
+		template <typename TElement>
+		auto get_impl(vector<TElement> *) -> vector<TElement>;
+
 		template <typename TElement>
 		auto get_sized_impl(size_t size, vector<TElement> *) -> vector<TElement>;
-#endif
 
 		unsigned char *m_buffer = nullptr;
 		size_t m_length = 0;

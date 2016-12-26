@@ -76,11 +76,10 @@ namespace vana {
 		auto add_impl(const TValue &val) -> void;
 		template <typename TValue>
 		auto add_sized_impl(const TValue &val, size_t size) -> void;
-#ifdef MSVC
 		template <typename TValue>
 		auto add_impl_default(const TValue &value) -> void;
-		template <typename TElement>
-		auto add_impl(const vector<TElement> &val) -> void;
+
+#ifdef MSVC
 		template <>
 		auto add_impl<bool>(const bool &val) -> void;
 		template <>
@@ -116,9 +115,15 @@ namespace vana {
 
 		template <>
 		auto add_sized_impl<string>(const string &val, size_t size) -> void;
+#endif
+
+		// std::vector related implementations
+
+		template <typename TElement>
+		auto add_impl(const vector<TElement> &val) -> void;
+
 		template <typename TElement>
 		auto add_sized_impl(const vector<TElement> &val, size_t size) -> void;
-#endif
 
 		size_t m_pos = 0;
 		size_t m_packet_capacity = 0;
