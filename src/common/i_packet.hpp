@@ -26,11 +26,15 @@ namespace vana {
 	template <typename T>
 	struct packet_serialize {
 		auto read(packet_reader &reader) -> T {
+#ifdef MSVC
 			static_assert(false, "T is not appropriately specialized for that type");
+#endif
 			throw std::logic_error{"T is not appropriately specialized for that type"};
 		};
 		auto write(packet_builder &builder, const T &obj) -> void {
+#ifdef MSVC
 			static_assert(false, "T is not appropriately specialized for that type");
+#endif
 			throw std::logic_error{"T is not appropriately specialized for that type"};
 		};
 	};

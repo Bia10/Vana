@@ -23,10 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 namespace vana {
 	namespace log {
-		enum type;
-
 		struct sql_log {
-			type type;
+			vana::log::type type;
 			time_t time;
 			string message;
 			opt_string identifier;
