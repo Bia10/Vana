@@ -60,12 +60,14 @@ namespace vana {
 
 		template <typename TValue>
 		auto skip_impl(TValue *) -> void;
+#ifdef MSVC
 		template <>
 		auto skip_impl<bool>(bool *) -> void;
 		template <>
 		auto skip_impl<string>(string *) -> void;
 		template <typename TElement>
 		auto skip_impl(vector<TElement> *) -> void;
+#endif
 
 		template <typename TValue>
 		auto get_impl(TValue *) -> TValue;
@@ -74,6 +76,8 @@ namespace vana {
 
 		template <typename TValue>
 		auto get_impl_default() -> TValue;
+
+#ifdef MSVC
 		template <>
 		auto get_impl<bool>(bool *) -> bool;
 		template <>
@@ -111,6 +115,7 @@ namespace vana {
 		auto get_sized_impl<string>(size_t size, string *) -> string;
 		template <typename TElement>
 		auto get_sized_impl(size_t size, vector<TElement> *) -> vector<TElement>;
+#endif
 
 		unsigned char *m_buffer = nullptr;
 		size_t m_length = 0;
