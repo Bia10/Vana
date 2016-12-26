@@ -174,7 +174,9 @@ namespace vana {
 
 	template <typename TValue>
 	auto packet_builder::add_sized_impl(const TValue &value, size_t size) -> void {
+#ifdef MSVC
 		static_assert(false, "T is not appropriately specialized for that type");
+#endif
 		throw std::logic_error{"T is not appropriately specialized for that type"};
 	}
 

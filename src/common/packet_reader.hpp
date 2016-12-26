@@ -188,7 +188,10 @@ namespace vana {
 
 	template <typename TValue>
 	auto packet_reader::get_sized_impl(size_t size, TValue *) -> TValue {
+#ifdef MSVC
+// GCC can't do compile time type checking on template level, I think
 		static_assert(false, "T is not appropriately specialized for that type");
+#endif
 		throw std::logic_error{"T is not appropriately specialized for that type"};
 	}
 
