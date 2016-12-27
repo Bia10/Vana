@@ -105,8 +105,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define THROW_CODE_EXCEPTION_IMPL_1(TypeName) \
 	throw TypeName{__FILE__, __LINE__};
 
-#define THROW_CODE_EXCEPTION(...) \
+#ifdef MSVC
+#define THROW_CODE_EXCEPTION( ...) \
 	DISPATCH(THROW_CODE_EXCEPTION_IMPL_, __VA_ARGS__)
+#else
+#define THROW_CODE_EXCEPTION(EXCEPTION_TYPE, ...) \
+	DISPATCH(THROW_CODE_EXCEPTION_IMPL_, (vana :: EXCEPTION_TYPE), __VA_ARGS__)
+#endif
+
 
 namespace vana {
 	enum class handle_result {

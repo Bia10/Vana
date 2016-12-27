@@ -45,7 +45,7 @@
 #define DEC_9 8
 #define DEC(x) PRIMITIVE_CAT(DEC_, x)
 
-#ifdef _WIN32
+#ifdef MSVC
 #define MSVC_VA_ARGS_WORKAROUND(define, args) define args
 #define CHECK_N(x, n, ...) n
 #define CHECK(...) MSVC_VA_ARGS_WORKAROUND(CHECK_N, (__VA_ARGS__, 0))
@@ -64,11 +64,8 @@
 #define IF(c) IIF(BOOL(c))
 
 #define COUNT_IMPL_(_1, _2, _3, _4, _5, N, ...) N
-#ifdef _WIN32
 #define ARG_EXPAND(x) x
 #define COUNT(...) ARG_EXPAND(COUNT_IMPL_(__VA_ARGS__, 5, 4, 3, 2, 1))
-#else
-#endif
 
 #define DISPATCH_IMPL2(Func, ArgCount) \
 	Func ## ArgCount
@@ -76,7 +73,7 @@
 #define DISPATCH_IMPL(Func, ArgCount) \
 	DISPATCH_IMPL2(Func, ArgCount)
 
-#ifdef _WIN32
+#ifdef MSVC
 #define DISPATCH(Func, ...)  \
 	ARG_EXPAND(DISPATCH_IMPL(Func, COUNT(__VA_ARGS__))(__VA_ARGS__))
 #else
