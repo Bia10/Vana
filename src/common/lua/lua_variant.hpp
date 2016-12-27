@@ -32,7 +32,9 @@ namespace vana {
 		template <typename T>
 		struct lua_variant_into {
 			auto transform(lua_environment &config, const lua_variant &val, const string &prefix) -> T {
+#ifdef MSVC
 				static_assert(false, "transform of T is not appropriately specialized for that type");
+#endif
 				throw std::logic_error{"transform of T is not appropriately specialized for that type"};
 			}
 		};
@@ -65,6 +67,7 @@ namespace vana {
 		private:
 			template <typename TResult>
 			auto as_impl(TResult *) const -> TResult;
+#ifdef MSVC
 			template <>
 			auto as_impl<lua_variant>(lua_variant *) const -> lua_variant;
 			template <>
@@ -93,6 +96,7 @@ namespace vana {
 			auto as_impl<minutes>(minutes *) const -> minutes;
 			template <>
 			auto as_impl<hours>(hours *) const -> hours;
+#endif
 			template <typename TElement>
 			auto as_impl(vector<TElement> *) const -> vector<TElement>;
 			template <typename TKey, typename TElement, typename THash = std::hash<TKey>, typename TOperation = std::equal_to<TKey>>
