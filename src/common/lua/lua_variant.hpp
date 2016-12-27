@@ -27,17 +27,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 namespace vana {
 	namespace lua {
 		class lua_environment;
-		class lua_variant;
-
-		template <typename T>
-		struct lua_variant_into {
-			auto transform(lua_environment &config, const lua_variant &val, const string &prefix) -> T {
-#ifdef MSVC
-				static_assert(false, "transform of T is not appropriately specialized for that type");
-#endif
-				throw std::logic_error{"transform of T is not appropriately specialized for that type"};
-			}
-		};
 
 		// Designed to represent any structure in Lua
 		class lua_variant {
@@ -160,6 +149,16 @@ namespace vana {
 		#ifdef _MSC_VER
 		#pragma warning(default: 4624)
 		#endif
+		};
+		
+		template <typename T>
+		struct lua_variant_into {
+			auto transform(lua_environment &config, const lua_variant &val, const string &prefix) -> T {
+#ifdef MSVC
+				static_assert(false, "transform of T is not appropriately specialized for that type");
+#endif
+				throw std::logic_error{"transform of T is not appropriately specialized for that type"};
+			}
 		};
 	}
 }
@@ -326,7 +325,9 @@ namespace vana {
 
 		template <typename TResult>
 		auto lua_variant::as_impl(TResult *) const -> TResult {
+#ifdef MSVC
 			static_assert(false, "as of TResult is not appropriately specialized for that type");
+#endif
 			throw std::logic_error{"as of TResult is not appropriately specialized for that type"};
 		}
 
