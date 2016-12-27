@@ -153,6 +153,7 @@ namespace vana {
 			// Begin push_impl
 			template <typename T>
 			auto push_impl(lua_State *lua_vm, const T &value) -> void;
+#ifdef MSVC
 			template <>
 			auto push_impl<bool>(lua_State *lua_vm, const bool &value) -> void;
 			template <>
@@ -181,6 +182,7 @@ namespace vana {
 			auto push_impl<hours>(lua_State *lua_vm, const hours &value) -> void;
 			template <>
 			auto push_impl<lua_variant>(lua_State *lua_vm, const lua_variant &value) -> void;
+#endif
 			template <typename TElement>
 			auto push_impl(lua_State *lua_vm, const vector<TElement> &value) -> void;
 			template <typename TKey, typename TElement, typename THash = std::hash<TKey>, typename TOperation = std::equal_to<TKey>>
@@ -194,6 +196,7 @@ namespace vana {
 			auto get_impl_default(lua_State *lua_vm, const string &key) -> T;
 			template <typename T>
 			auto get_impl(lua_State *lua_vm, const string &key, T *) -> T;
+#ifdef MSVC
 			template <>
 			auto get_impl<bool>(lua_State *lua_vm, const string &key, bool *) -> bool;
 			template <>
@@ -222,6 +225,7 @@ namespace vana {
 			auto get_impl<hours>(lua_State *lua_vm, const string &key, hours *) -> hours;
 			template <>
 			auto get_impl<lua_variant>(lua_State *lua_vm, const string &key, lua_variant *) -> lua_variant;
+#endif
 			template <typename TElement>
 			auto get_impl(lua_State *lua_vm, const string &key, vector<TElement> *) -> vector<TElement>;
 			template <typename TKey, typename TElement, typename THash = std::hash<TKey>, typename TOperation = std::equal_to<TKey>>
@@ -235,6 +239,7 @@ namespace vana {
 			auto getInteger(lua_State *lua_vm, int index) -> TInteger;
 			template <typename T>
 			auto get_impl(lua_State *lua_vm, int index, T *) -> T;
+#ifdef MSVC
 			template <>
 			auto get_impl<bool>(lua_State *lua_vm, int index, bool *) -> bool;
 			template <>
@@ -263,6 +268,7 @@ namespace vana {
 			auto get_impl<hours>(lua_State *lua_vm, int index, hours *) -> hours;
 			template <>
 			auto get_impl<lua_variant>(lua_State *lua_vm, int index, lua_variant *) -> lua_variant;
+#endif
 			template <typename TElement>
 			auto get_impl(lua_State *lua_vm, int index, vector<TElement> *) -> vector<TElement>;
 			template <typename TKey, typename TElement, typename THash = std::hash<TKey>, typename TOperation = std::equal_to<TKey>>
