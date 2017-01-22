@@ -115,5 +115,8 @@
     <ClInclude Include="src\login_server\login_server_accepted_session.hpp">
       <Filter>Inter-Server\Channel/World</Filter>
     </ClInclude>
+    <ClInclude Include="src\login_server\pin_action.hpp">
+      <Filter>LoginServer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

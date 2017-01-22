@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "common/util/time.hpp"
 #include "login_server/login_packet.hpp"
 #include "login_server/login_server.hpp"
+#include "login_server/pin_action.hpp"
 #include "login_server/player_status.hpp"
 #include "login_server/user.hpp"
 #include <iostream>
@@ -40,6 +41,13 @@ namespace login_server {
 auto login::login_user(ref_ptr<user> user_value, packet_reader &reader) -> void {
 	string username = reader.get<string>();
 	string password = reader.get<string>();
+	reader.skip(16); // Device ID, low entropy, however
+	reader.unk<int32_t>(); // GameRoom client ID, decided by processes running
+	reader.unk<int8_t>(); // Start mode (WebStart or just regular launching the client)
+	reader.unk<int8_t>(); // Set to 0, could be admin client flag
+	reader.unk<int8_t>(); // Set to 0, could be admin client flag
+	reader.unk<int32_t>(); // 'Partner Code', read from registry: HKLM/SOFTWARE/Wizet/MapleStory/uiWndZ0 (should not exist?)
+		
 
 	if (!ext::in_range_inclusive<size_t>(username.size(), constant::character::min_name_size, constant::character::max_name_size)) {
 		// Hacking
@@ -255,14 +263,24 @@ auto login::check_pin(ref_ptr<user> user_value, packet_reader &reader) -> void {
 		// Hacking
 		return;
 	}
-	int8_t act = reader.get<int8_t>();
-	reader.unk<uint8_t>();
-	reader.unk<uint32_t>();
-
-	if (act == 0x00) {
-		user_value->set_status(player_status::ask_pin);
+	pin_action act = static_cast<pin_action>(reader.get<int8_t>());
+	if (act == pin_action::dialog_closed) {
+		user_value->set_status(player_status::not_logged_in);
+		return;
 	}
-	else if (act == 0x01) {
+
+	// This value is used for the response code.
+	// When it's true, you are required to send an 'invalid password' error,
+	// only when the response code we figured out is not 0 and not 'invalid pin'
+	reader.unk<uint8_t>();
+	game_account_id account_id = reader.get<game_account_id>();
+
+	if (account_id != user_value->get_account_id()) {
+		// Hacking
+		return;
+	}
+
+	if (act == pin_action::check_pin) {
 		int32_t pin = vana::util::str::lexical_cast<int32_t>(reader.get<string>());
 		opt_int32_t current = user_value->get_pin();
 		if (!current.is_initialized()) {
@@ -277,7 +295,7 @@ auto login::check_pin(ref_ptr<user> user_value, packet_reader &reader) -> void {
 			user_value->send(packets::login_process(packets::errors::invalid_pin));
 		}
 	}
-	else if (act == 0x02) {
+	else if (act == pin_action::change_pin) {
 		int32_t pin = vana::util::str::lexical_cast<int32_t>(reader.get<string>());
 		auto current = user_value->get_pin();
 		if (!current.is_initialized()) {

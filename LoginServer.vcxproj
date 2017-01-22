@@ -135,6 +135,7 @@
   <ItemGroup>
     <ClInclude Include="src\login_server\channel.hpp" />
     <ClInclude Include="src\login_server\cmsg_header.hpp" />
+    <ClInclude Include="src\login_server\pin_action.hpp" />
     <ClInclude Include="src\login_server\precompiled_header.hpp" />
     <ClInclude Include="src\login_server\login_packet.hpp" />
     <ClInclude Include="src\login_server\login_packet_helper.hpp" />
