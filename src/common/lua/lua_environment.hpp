@@ -33,21 +33,6 @@ extern "C" {
 
 namespace vana {
 	namespace lua {
-		class lua_environment;
-
-		template <typename T>
-		struct lua_serialize {
-			auto read(lua_environment &config, int stack_index) -> T {
-				static_assert(false, "index read of T is not appropriately specialized for that type");
-				throw std::logic_error{"index read of T is not appropriately specialized for that type"};
-			}
-
-			auto read(lua_environment &config, const string &prefix) -> T {
-				static_assert(false, "string prefix read of T is not appropriately specialized for that type");
-				throw std::logic_error{"string prefix read of T is not appropriately specialized for that type"};
-			}
-		};
-
 		// TODO FIXME lua
 		// Lua 5.2 doesn't support 64-bit integers out of the box, it needs special compilation and #defines to make it right
 		// Lua 5.3 tentatively looks like 64-bit integer will be the default integer size, so at that point, I can update this
@@ -283,6 +268,19 @@ namespace vana {
 			lua_State *m_lua_thread = nullptr;
 			string m_file;
 			int32_t m_environment_id;
+		};
+		
+		template <typename T>
+		struct lua_serialize {
+			auto read(lua_environment &config, int stack_index) -> T {
+				static_assert(false, "index read of T is not appropriately specialized for that type");
+				throw std::logic_error{"index read of T is not appropriately specialized for that type"};
+			}
+
+			auto read(lua_environment &config, const string &prefix) -> T {
+				static_assert(false, "string prefix read of T is not appropriately specialized for that type");
+				throw std::logic_error{"string prefix read of T is not appropriately specialized for that type"};
+			}
 		};
 
 		template <typename T>
