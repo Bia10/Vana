@@ -190,7 +190,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 #define CMSG_CASHSHOP_CHECK_CASH 0xda
-
+#define CMSG_CASHSHOP_PURCHASE 0xdb
 #define CMSG_CASHSHOP_REDEEM_COUPON 0xdc
 #define CMSG_CASHSHOP_OPERATION 0xdb
 

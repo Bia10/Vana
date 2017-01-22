@@ -33,17 +33,22 @@ PACKET_IMPL(show_exp, game_experience exp, bool white, bool in_chat) {
 		.add<bool>(white)
 		.add<game_experience>(exp)
 		.add<bool>(in_chat)
-		.unk<int32_t>()
-		.unk<int8_t>()
-		.unk<int8_t>()
-		.unk<int32_t>();
+		.add<int32_t>(0) // Wedding EXP
+		.unk<int8_t>() // Hunting hours bonus exp rate
+		.unk<int8_t>() // Some other rate that affects the final 
+		.unk<int32_t>(); // Bonus wedding EXP (Married + in same party)
 
 	if (in_chat) {
-		builder.unk<int8_t>();
+		int8_t spiritWeekBonusEXPRate = 0; // 0-100%
+		builder.add<int8_t>(spiritWeekBonusEXPRate); // Spirit week bonus percentage
+		if (spiritWeekBonusEXPRate > 0) {
+			builder.add<int8_t>(0); // Additional bonus EXP for the next N quests
+		}
 	}
+
 	builder
-		.unk<int8_t>()
-		.unk<int32_t>();
+		.unk<int8_t>() // Party bonus EXP event rate
+		.unk<int32_t>(); // Equip item bonus EXP
 	return builder;
 }
 
