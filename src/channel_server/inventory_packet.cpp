@@ -36,14 +36,58 @@ namespace packets {
 namespace inventory {
 
 SPLIT_PACKET_IMPL(update_player, ref_ptr<player> player) {
+	uint8_t flags = 0x01;
 	split_packet_builder builder;
-	builder.player
+	packet_builder &packet = builder.player;
+	packet
 		.add<packet_header>(SMSG_PLAYER_CHANGE_LOOK)
 		.add<game_player_id>(player->get_id())
-		.add<int8_t>(1)
-		.add_buffer(helpers::add_player_display(player))
-		.unk<int8_t>()
-		.unk<int16_t>();
+		.add<uint8_t>(flags);
+
+	if (flags & 0x01) {
+		packet
+			.add_buffer(helpers::add_player_display(player));
+	}
+	
+	if (flags & 0x02) {
+		packet
+			.unk<int8_t>(0); // Speed. We don't have this calculated so cannot send it
+	}
+	
+	if (flags & 0x04) {
+		packet
+			.add<int8_t>(static_cast<int8_t>(player->get_inventory()->get_item_amount(constant::item::choco)));
+	}
+
+	bool b = false;
+	// Couple info
+	packet.unk<bool>(b);
+	if (b) {
+		packet
+			.unk<uint64_t>()
+			.unk<uint64_t>()
+			.unk<uint32_t>();
+	}
+	
+	b = false;
+	// Friendship info
+	packet.unk<bool>(b);
+	if (b) {
+		packet
+			.unk<uint64_t>()
+			.unk<uint64_t>()
+			.unk<uint32_t>();
+	}
+
+	b = false;
+	// Marriage info
+	packet.unk<bool>(b);
+	if (b) {
+		packet
+			.unk<uint32_t>()
+			.unk<uint32_t>()
+			.unk<uint32_t>();
+	}
 
 	builder.map.add_buffer(builder.player);
 	return builder;
