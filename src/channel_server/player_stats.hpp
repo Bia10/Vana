@@ -98,8 +98,6 @@ namespace vana {
 			auto add_stat(packet_reader &reader) -> void;
 			auto add_stat_multi(packet_reader &reader) -> void;
 			auto add_stat(int32_t type, int16_t mod = 1, bool is_reset = false) -> void;
-			auto ap_reset_hp(bool is_reset, bool is_subtract, int16_t val, int16_t s_val = 0) -> int16_t;
-			auto ap_reset_mp(bool is_reset, bool is_subtract, int16_t val, int16_t s_val = 0) -> int16_t;
 			auto get_x(game_skill_id skill_id) -> int16_t;
 			auto get_y(game_skill_id skill_id) -> int16_t;
 			auto get_exp(game_player_level level) -> game_experience;
@@ -126,10 +124,6 @@ namespace vana {
 		private:
 			auto update_bonuses(bool update_equips = false, bool is_loading = false) -> void;
 			auto modified_hp() -> void;
-			auto rand_hp() -> game_health;
-			auto rand_mp() -> game_health;
-			auto level_hp(game_health val, game_health bonus = 0) -> game_health;
-			auto level_mp(game_health val, game_health bonus = 0) -> game_health;
 			auto stat_utility(int32_t test) -> int16_t;
 
 			game_player_level m_level = 0;

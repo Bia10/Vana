@@ -493,7 +493,10 @@ auto player_stats::set_fame(game_fame fame) -> void {
 
 auto player_stats::lose_exp() -> void {
 	if (auto player = m_player.lock()) {
-		if (!vana::util::game_logic::job::is_beginner_job(get_job()) && get_level() < vana::util::game_logic::job::get_max_level(get_job()) && player->get_map_id() != constant::map::sorcerers_room) {
+		if (!vana::util::game_logic::job::is_beginner_job(get_job()) && 
+			get_level() < vana::util::game_logic::job::get_max_level(get_job()) && 
+			// TODO: Really? Sorcerers room has no EXP loss?
+			player->get_map_id() != constant::map::sorcerers_room) {
 			game_slot_qty charms = player->get_inventory()->get_item_amount(constant::item::safety_charm);
 			if (charms > 0) {
 				inventory::take_item(player, constant::item::safety_charm, 1);
@@ -503,22 +506,22 @@ auto player_stats::lose_exp() -> void {
 				return;
 			}
 			map *loc = player->get_map();
-			int8_t exp_loss = 10;
+			double_t exp_loss;
 			if (loc->lose_one_percent()) {
-				exp_loss = 1;
+				exp_loss = 0.01;
 			}
 			else {
-				switch (vana::util::game_logic::job::get_job_line(get_job())) {
-					case constant::job::line::magician:
-						exp_loss = 7;
-						break;
-					case constant::job::line::thief:
-						exp_loss = 5;
-						break;
+				if (vana::util::game_logic::job::get_job_line(get_job()) == constant::job::line::magician) {
+					exp_loss = 0.08;
 				}
+				else {
+					exp_loss = 0.2;
+				}
+
+				exp_loss = exp_loss / static_cast<double_t>(player->get_stats()->get_luk(true)) + 0.05;
 			}
 			game_experience exp = get_exp();
-			exp -= static_cast<game_experience>(static_cast<int64_t>(get_exp(get_level())) * exp_loss / 100);
+			exp -= static_cast<game_experience>(static_cast<double_t>(get_exp(get_level())) * exp_loss);
 			set_exp(exp);
 		}
 	}
@@ -555,61 +558,40 @@ auto player_stats::give_exp(uint64_t exp, bool in_chat, bool white) -> void {
 			game_stat sp_gain = 0;
 			game_health hp_gain = 0;
 			game_health mp_gain = 0;
-			int8_t job_line = vana::util::game_logic::job::get_job_line(full_job);
-			game_stat intl = get_int(true) / 10;
-			game_health x = 0; // X value for Improving *P Increase skills, cached, only needs to be set once
+			int8_t job = vana::util::game_logic::job::get_job_track(get_job() % 1000);
 
 			while (cur_exp >= get_exp(level) && levels_gained < levels_max) {
 				cur_exp -= get_exp(get_level());
 				level++;
 				levels_gained++;
+
+				const constant::stat::hp_mp_formula_arguments formula = constant::stat::hp_mp_formula[job][0];
+
+				hp_gain += vana::util::randomizer::rand<game_health>(formula.hp_max, formula.hp_min);
+				mp_gain += vana::util::randomizer::rand<game_health>(formula.mp_max, formula.mp_min);
+
+				// Additional buffing through INT stats
+				mp_gain += player->get_stats()->get_int(true) * formula.mp_int_stat_multiplier / 200;
+
+				if (player->get_skills()->has_hp_increase()) {
+					hp_gain += get_y(player->get_skills()->get_hp_increase());
+				}
+				if (player->get_skills()->has_mp_increase()) {
+					mp_gain += get_y(player->get_skills()->get_mp_increase());
+				}
+
+
 				if (cygnus && level <= constant::stat::cygnus_ap_cutoff) {
 					ap_gain += constant::stat::ap_per_cygnus_level;
 				}
 				else {
 					ap_gain += constant::stat::ap_per_level;
 				}
-				switch (job_line) {
-					case constant::job::line::beginner:
-						hp_gain += level_hp(constant::stat::base_hp::beginner);
-						mp_gain += level_mp(constant::stat::base_mp::beginner, intl);
-						break;
-					case constant::job::line::warrior:
-						if (levels_gained == 1 && player->get_skills()->has_hp_increase()) {
-							x = get_x(player->get_skills()->get_hp_increase());
-						}
-						hp_gain += level_hp(constant::stat::base_hp::warrior, x);
-						mp_gain += level_mp(constant::stat::base_mp::warrior, intl);
-						break;
-					case constant::job::line::magician:
-						if (levels_gained == 1 && player->get_skills()->has_mp_increase()) {
-							x = get_x(player->get_skills()->get_mp_increase());
-						}
-						hp_gain += level_hp(constant::stat::base_hp::magician);
-						mp_gain += level_mp(constant::stat::base_mp::magician, 2 * x + intl);
-						break;
-					case constant::job::line::bowman:
-						hp_gain += level_hp(constant::stat::base_hp::bowman);
-						mp_gain += level_mp(constant::stat::base_mp::bowman, intl);
-						break;
-					case constant::job::line::thief:
-						hp_gain += level_hp(constant::stat::base_hp::thief);
-						mp_gain += level_mp(constant::stat::base_mp::thief, intl);
-						break;
-					case constant::job::line::pirate:
-						if (levels_gained == 1 && player->get_skills()->has_hp_increase()) {
-							x = get_x(player->get_skills()->get_hp_increase());
-						}
-						hp_gain += level_hp(constant::stat::base_hp::pirate, x);
-						mp_gain += level_mp(constant::stat::base_mp::pirate, intl);
-						break;
-					default: // GM
-						hp_gain += constant::stat::base_hp::gm;
-						mp_gain += constant::stat::base_mp::gm;
-				}
+
 				if (!vana::util::game_logic::job::is_beginner_job(full_job)) {
 					sp_gain += constant::stat::sp_per_level;
 				}
+
 				if (level >= job_max) {
 					// Do not let people level past the level cap
 					cur_exp = 0;
@@ -742,49 +724,23 @@ auto player_stats::add_stat(int32_t type, int16_t mod, bool is_reset) -> void {
 					// Hacking
 					return;
 				}
-				int8_t job = vana::util::game_logic::job::get_job_track(get_job());
-				game_health hp_gain = 0;
-				game_health mp_gain = 0;
-				game_health y = 0;
-				switch (job) {
-					case constant::job::track::beginner:
-						hp_gain = ap_reset_hp(is_reset, is_subtract, constant::stat::base_hp::beginner_ap);
-						mp_gain = ap_reset_mp(is_reset, is_subtract, constant::stat::base_mp::beginner_ap);
-						break;
-					case constant::job::track::warrior:
-						if (player->get_skills()->has_hp_increase()) {
-							y = get_y(player->get_skills()->get_hp_increase());
-						}
-						hp_gain = ap_reset_hp(is_reset, is_subtract, constant::stat::base_hp::warrior_ap, y);
-						mp_gain = ap_reset_mp(is_reset, is_subtract, constant::stat::base_mp::warrior_ap);
-						break;
-					case constant::job::track::magician:
-						if (player->get_skills()->has_mp_increase()) {
-							y = get_y(player->get_skills()->get_mp_increase());
-						}
-						hp_gain = ap_reset_hp(is_reset, is_subtract, constant::stat::base_hp::magician_ap);
-						mp_gain = ap_reset_mp(is_reset, is_subtract, constant::stat::base_mp::magician_ap, 2 * y);
-						break;
-					case constant::job::track::bowman:
-						hp_gain = ap_reset_hp(is_reset, is_subtract, constant::stat::base_hp::bowman_ap);
-						mp_gain = ap_reset_mp(is_reset, is_subtract, constant::stat::base_mp::bowman_ap);
-						break;
-					case constant::job::track::thief:
-						hp_gain = ap_reset_hp(is_reset, is_subtract, constant::stat::base_hp::thief_ap);
-						mp_gain = ap_reset_mp(is_reset, is_subtract, constant::stat::base_mp::thief_ap);
-						break;
-					case constant::job::track::pirate:
-						if (player->get_skills()->has_hp_increase()) {
-							y = get_y(player->get_skills()->get_hp_increase());
-						}
-						hp_gain = ap_reset_hp(is_reset, is_subtract, constant::stat::base_hp::pirate_ap, y);
-						mp_gain = ap_reset_mp(is_reset, is_subtract, constant::stat::base_mp::pirate_ap);
-						break;
-					default: // GM
-						hp_gain = ap_reset_hp(is_reset, is_subtract, constant::stat::base_hp::gm_ap);
-						mp_gain = ap_reset_mp(is_reset, is_subtract, constant::stat::base_mp::gm_ap);
-						break;
+				int8_t job = vana::util::game_logic::job::get_job_track(get_job() % 1000);
+
+				const constant::stat::hp_mp_formula_arguments formula = constant::stat::hp_mp_formula[job][1];
+
+				game_health hp_gain = vana::util::randomizer::rand<game_health>(formula.hp_max, formula.hp_min);
+				game_health mp_gain = vana::util::randomizer::rand<game_health>(formula.mp_max, formula.mp_min);
+
+				// Additional buffing through INT stats
+				mp_gain += player->get_stats()->get_int(true) * formula.mp_int_stat_multiplier / 200;
+
+				if (player->get_skills()->has_hp_increase()) {
+					hp_gain += get_y(player->get_skills()->get_hp_increase());
 				}
+				if (player->get_skills()->has_mp_increase()) {
+					mp_gain += get_y(player->get_skills()->get_mp_increase());
+				}
+
 				set_hp_mp_ap(get_hp_mp_ap() + mod);
 				switch (type) {
 					case constant::stat::max_hp: modify_max_hp(hp_gain); break;
@@ -817,14 +773,6 @@ auto player_stats::add_stat(int32_t type, int16_t mod, bool is_reset) -> void {
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
 }
 
-auto player_stats::rand_hp() -> game_health {
-	return vana::util::randomizer::rand<game_health>(constant::stat::base_hp::variation); // Max HP range per class (e.g. Beginner is 8-12)
-}
-
-auto player_stats::rand_mp() -> game_health {
-	return vana::util::randomizer::rand<game_health>(constant::stat::base_mp::variation); // Max MP range per class (e.g. Beginner is 6-8)
-}
-
 auto player_stats::get_x(game_skill_id skill_id) -> int16_t {
 	if (auto player = m_player.lock()) {
 		return player->get_skills()->get_skill_info(skill_id)->x;
@@ -837,22 +785,6 @@ auto player_stats::get_y(game_skill_id skill_id) -> int16_t {
 		return player->get_skills()->get_skill_info(skill_id)->y;
 	}
 	else THROW_CODE_EXCEPTION(invalid_operation_exception, "This should never be thrown");
-}
-
-auto player_stats::ap_reset_hp(bool is_reset, bool is_subtract, int16_t val, int16_t s_val) -> int16_t {
-	return (is_reset ? (is_subtract ? -(s_val + val + constant::stat::base_hp::variation) : val) : level_hp(val, s_val));
-}
-
-auto player_stats::ap_reset_mp(bool is_reset, bool is_subtract, int16_t val, int16_t s_val) -> int16_t {
-	return (is_reset ? (is_subtract ? -(s_val + val + constant::stat::base_mp::variation) : val) : level_mp(val, s_val));
-}
-
-auto player_stats::level_hp(game_health val, game_health bonus) -> game_health {
-	return rand_hp() + val + bonus;
-}
-
-auto player_stats::level_mp(game_health val, game_health bonus) -> game_health {
-	return rand_mp() + val + bonus;
 }
 
 auto player_stats::get_exp(game_player_level level) -> game_experience {

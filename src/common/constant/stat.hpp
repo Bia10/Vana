@@ -131,46 +131,30 @@ namespace vana {
 		#	error Please fill in appropriate EXP levels for your locale/version
 		#endif
 			};
+			
+			// Stored inside the client. Tip: Search for the value 2000001, or look for the array that is above "StandardPDD.img" unicode string
+			struct hp_mp_formula_arguments {
+				uint32_t hp_min;
+				uint32_t hp_max;
+				uint32_t unk; // Not used?
+				uint32_t mp_min;
+				uint32_t mp_max;
+				uint32_t mp_int_stat_multiplier;
+			};
 
-			namespace base_hp {
-				const game_health variation = 4; // This is the range of HP that the server will give
-
-				const game_health beginner = 12; // These are base HP values rewarded on level up
-				const game_health warrior = 24;
-				const game_health magician = 10;
-				const game_health bowman = 20;
-				const game_health thief = 20;
-				const game_health pirate = 22;
-				const game_health gm = 150;
-
-				const game_health beginner_ap = 8; // These are base HP values rewarded on AP distribution
-				const game_health warrior_ap = 20;
-				const game_health magician_ap = 8;
-				const game_health bowman_ap = 16;
-				const game_health thief_ap = 16;
-				const game_health pirate_ap = 18;
-				const game_health gm_ap = 16;
-			}
-
-			namespace base_mp {
-				const game_health variation = 2; // This is the range of MP that the server will give
-
-				const game_health beginner = 10; // These are base MP values rewarded on level up
-				const game_health warrior = 4;
-				const game_health magician = 6;
-				const game_health bowman = 14;
-				const game_health thief = 14;
-				const game_health pirate = 18;
-				const game_health gm = 150;
-
-				const game_health beginner_ap = 6; // These are base MP values rewarded on AP distribution
-				const game_health warrior_ap = 2;
-				const game_health magician_ap = 18;
-				const game_health bowman_ap = 10;
-				const game_health thief_ap = 10;
-				const game_health pirate_ap = 14;
-				const game_health gm_ap = 10;
-			}
+			// For each job, there are 2 sets of values. First is for levelup only, second for mphp ups
+			const hp_mp_formula_arguments hp_mp_formula[10][2] = {
+				{{12, 16, 0, 10, 12, 20}, {8, 12, 0, 6, 8, 15}}, // Beginner
+				{{24, 28, 0, 4, 6, 20}, {20, 24, 0, 2, 4, 15}}, // Warrior
+				{{10, 14, 0, 22, 24, 20}, {6, 10, 0, 18, 20, 15}}, // Magician
+				{{20, 24, 0, 14, 16, 20}, {16, 20, 0, 10, 12, 15}}, // Bowman
+				{{20, 24, 0, 14, 16, 20}, {16, 20, 0, 10, 12, 15}}, // Thief
+				{{22, 26, 0, 18, 22, 20}, {18, 20, 0, 14, 16, 15}}, // Pirate
+				{{}, {}}, // Empty...
+				{{}, {}}, // Empty...
+				{{}, {}}, // Empty...
+				{{20, 24, 0, 14, 16, 20}, {16, 20, 0, 10, 12, 15}}, // GM
+			};
 
 			enum constants : int32_t {
 				// byte 0
