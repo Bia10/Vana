@@ -26,11 +26,11 @@ namespace channel_server {
 namespace packets {
 namespace fame {
 
-PACKET_IMPL(send_error, int32_t reason) {
+PACKET_IMPL(send_error, errors reason) {
 	packet_builder builder;
 	builder
 		.add<packet_header>(SMSG_FAME)
-		.add<int32_t>(reason);
+		.add<int8_t>(static_cast<int8_t>(reason));
 	return builder;
 }
 
@@ -38,7 +38,7 @@ PACKET_IMPL(send_fame, const string &name, uint8_t type, int32_t new_fame) {
 	packet_builder builder;
 	builder
 		.add<packet_header>(SMSG_FAME)
-		.add<int8_t>(0x00)
+		.add<int8_t>(static_cast<int8_t>(errors::no_error_fame_sent))
 		.add<string>(name)
 		.add<int8_t>(type)
 		.add<int32_t>(new_fame);
@@ -49,7 +49,7 @@ PACKET_IMPL(receive_fame, const string &name, uint8_t type) {
 	packet_builder builder;
 	builder
 		.add<packet_header>(SMSG_FAME)
-		.add<int8_t>(0x05)
+		.add<int8_t>(static_cast<int8_t>(errors::no_error_fame_received))
 		.add<string>(name)
 		.add<int8_t>(type);
 	return builder;

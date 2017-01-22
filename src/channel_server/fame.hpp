@@ -17,6 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 #pragma once
 
+#include "channel_server/fame_packet.hpp"
 #include "common/types.hpp"
 
 namespace vana {
@@ -27,7 +28,7 @@ namespace vana {
 
 		namespace fame {
 			auto handle_fame(ref_ptr<player> player, packet_reader &reader) -> void;
-			auto can_fame(ref_ptr<player> player, game_player_id to) -> int32_t;
+			auto can_fame(ref_ptr<player> player, game_player_id to) -> packets::fame::errors;
 			auto add_fame_log(game_player_id from, game_player_id to) -> void;
 			auto get_last_fame_log(game_player_id from) -> search_result;
 			auto get_last_fame_sp_log(game_player_id from, game_player_id to) -> search_result;

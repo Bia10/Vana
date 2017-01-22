@@ -34,8 +34,8 @@ auto fame::handle_fame(ref_ptr<player> player, packet_reader &reader) -> void {
 			// Hacking
 			return;
 		}
-		int32_t check_result = can_fame(player, target_id);
-		if (check_result != 0) {
+		packets::fame::errors check_result = can_fame(player, target_id);
+		if (check_result == packets::fame::errors::no_error_fame_sent) {
 			player->send(packets::fame::send_error(check_result));
 		}
 		else {
@@ -52,7 +52,7 @@ auto fame::handle_fame(ref_ptr<player> player, packet_reader &reader) -> void {
 	}
 }
 
-auto fame::can_fame(ref_ptr<player> player, game_player_id to) -> int32_t {
+auto fame::can_fame(ref_ptr<player> player, game_player_id to) -> packets::fame::errors {
 	game_player_id from = player->get_id();
 	if (player->get_stats()->get_level() < 15) {
 		return packets::fame::errors::level_under15;
@@ -63,7 +63,7 @@ auto fame::can_fame(ref_ptr<player> player, game_player_id to) -> int32_t {
 	if (get_last_fame_sp_log(from, to) == search_result::found) {
 		return packets::fame::errors::famed_this_month;
 	}
-	return 0;
+	return packets::fame::errors::no_error_fame_sent;
 }
 
 auto fame::add_fame_log(game_player_id from, game_player_id to) -> void {

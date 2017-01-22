@@ -26,18 +26,18 @@ namespace vana {
 
 		namespace packets {
 			namespace fame {
-				namespace errors {
-					enum errors : int8_t {
-						incorrect_user = 0x01,
-						level_under15 = 0x02,
-						already_famed_today = 0x03,
-						famed_this_month = 0x04
-					};
-				}
-
+				enum class errors : int8_t {
+					no_error_fame_sent = 0,
+					incorrect_user = 1,
+					level_under15 = 2,
+					already_famed_today = 3,
+					famed_this_month = 4,
+					no_error_fame_received = 5,
+				};
+				
+				PACKET(send_error, errors reason);
 				PACKET(send_fame, const string &name, uint8_t type, int32_t new_fame);
 				PACKET(receive_fame, const string &name, uint8_t type);
-				PACKET(send_error, int32_t reason);
 			}
 		}
 	}

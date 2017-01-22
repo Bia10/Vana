@@ -52,9 +52,7 @@ SPLIT_PACKET_IMPL(update_player, ref_ptr<player> player) {
 SPLIT_PACKET_IMPL(sit_chair, game_player_id player_id, game_item_id chair_id) {
 	split_packet_builder builder;
 	builder.player
-		.add<packet_header>(SMSG_PLAYER_UPDATE)
-		.add<int16_t>(1)
-		.unk<int32_t>();
+		.add<packet_header>(SMSG_EXCL_REQUEST);
 
 	builder.map
 		.add<packet_header>(SMSG_CHAIR_SIT)

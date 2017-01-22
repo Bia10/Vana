@@ -165,16 +165,14 @@ PACKET_IMPL(update_summoned_pets, ref_ptr<player> player) {
 			builder.add<game_pet_id>(0);
 		}
 	}
+	// Update movement speed using this variable (will make client recalculate it)
 	builder.unk<int8_t>();
 	return builder;
 }
 
 PACKET_IMPL(blank_update) {
 	packet_builder builder;
-	builder
-		.add<packet_header>(SMSG_PLAYER_UPDATE)
-		.add<int8_t>(1)
-		.unk<int32_t>();
+	builder.add<packet_header>(SMSG_EXCL_REQUEST);
 	return builder;
 }
 

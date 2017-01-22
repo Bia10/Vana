@@ -60,10 +60,7 @@ SPLIT_PACKET_IMPL(level_up, game_player_id player_id) {
 
 PACKET_IMPL(stat_ok) {
 	packet_builder builder;
-	builder
-		.add<packet_header>(SMSG_PLAYER_UPDATE)
-		.unk<int16_t>(1)
-		.unk<int32_t>();
+	builder.add<packet_header>(SMSG_EXCL_REQUEST);
 	return builder;
 }
 
